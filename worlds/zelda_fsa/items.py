@@ -157,4 +157,5 @@ TRAP_ITEMS: dict[str, tuple[int, int]] = {
 ALL_ITEMS_TABLE: dict[str, tuple[int, int]] = {
     **ALL_PROGRESSION_ITEMS,
     **JUNK_ITEMS,
+    **TRAP_ITEMS,
 }
