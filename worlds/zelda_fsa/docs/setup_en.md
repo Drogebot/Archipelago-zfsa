@@ -39,7 +39,7 @@ every game in your `custom_worlds` folder. You can manually edit the config file
 3. Navigate to the Archipelago website and go to the Host Game page
 4. Click upload file and pass it the .zip created in your output folder
 5. Click the "Create New Room" link.
-6. Run FSAAPPatcher and enter your full file-path to your iso, ex. `C:\Users\Drogebot\...\Games\Legend of Zelda, The - Four Swords Adventures (USA).iso`.
+6. Run FSAAPPatcher and enter your full file-path to your iso, e.g. `C:\Users\Drogebot\...\Games\Legend of Zelda, The - Four Swords Adventures (USA).iso`.
 7. Open Dolphin and from Dolphin, open the generated randomized ISO of Four Swords Adventures (Usually located in the same directory as the patch file).
    - Ensure that "Enable CPU Overclock" and "Emulated Memory Size Override" are both off in your Dolphin settings
 8. In your Archipelago Launcher run "Zelda Four Swords Adventures Client"

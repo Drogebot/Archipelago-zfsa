@@ -73,12 +73,12 @@ def zfsa_requirements_satisfied(state: CollectionState, requirements: Requiremen
         if not state.has(key.name, world.player, key.amount):
             return False
     
+    if requirements.special_the_mountain_path and not (state.has("Power Bracelet", world.player) or state.has("Progressive Lamp", world.player) or state.has("Progressive Magic Hammer", world.player) or state.has("Progressive Fire Rod", world.player)):
+        return False
     if requirements.special_the_swamp and not (state.has("The Swamp Moon Gate", world.player) or state.has("Progressive Roc's Feather", world.player, 2) or state.has("Progressive Pegasus Boots", world.player, 2)):
         return False
-    
     if requirements.special_temple_of_darkness and not (state.has("Temple of Darkness Progressive Key", world.player) or state.has("Progressive Roc's Feather", world.player)):
         return False
-    
     if requirements.special_palace_of_winds and not (state.has("Palace of Winds Progressive 2F North Key", world.player, 2) or (state.has("Progressive Roc's Feather", world.player) or state.has("Progressive Pegasus Boots", world.player, 2)) and state.has("Progressive Bombs", world.player)):
         return False
     
@@ -94,6 +94,10 @@ def zfsa_requirements_satisfied(state: CollectionState, requirements: Requiremen
         if requirements.helmaroc_regroup and my_items & (ItemType.magic_hammer | ItemType.bombs) == ItemType(0):
             return False
         if requirements.bowless_gohma and my_items & (ItemType.bow) == ItemType(0):
+            return False
+        if requirements.jump_pound and my_items & (ItemType.rocs_feather | ItemType.bombs) == ItemType(0):
+            return False
+        if requirements.jump_pound_side and my_items & (ItemType.pegasus_boots | ItemType.rocs_feather | ItemType.bombs) == ItemType(0):
             return False
     
     return True

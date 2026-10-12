@@ -27,7 +27,7 @@
 - Progressive Level x Ticket (2 per Level)
 - 4 Royal Jewels
 - 7 Maidens (no function currently)
-- 1 of every Key, Moon Pearl, Book, or Letter (some act as progressive if they are required in order) (65 total)
+- 1 of every Key, Moon Pearl, Book, or Letter (some act as progressive if they are required in order) (66 total)
 
 ### Traps
 

@@ -88,6 +88,7 @@ class ZfsaContext(CommonContext):
 
     options: ZfsaOptions
 
+    ap_connected = False
     hook_check = False
     hook_nagged = False
 
@@ -182,6 +183,8 @@ class ZfsaContext(CommonContext):
             
             self.set_notify(get_fairy_storage_key_received(self))
             self.set_notify(get_fairy_storage_key_remaining(self))
+            
+            self.ap_connected = True
     
     def on_deathlink(self, data: dict):
         super().on_deathlink(data)
@@ -291,6 +294,7 @@ def send_victory(ctx: ZfsaContext):
 
     ctx.victory = True
     ctx.send_msgs([{"cmd": "StatusUpdate", "status": ClientStatus.CLIENT_GOAL}])
+    time.sleep(1)
     logger.info("Congratulations on completing your seed!")
     time.sleep(.05)
     logger.info("ARCHIPELAGO THE LEGEND OF ZELDA: FOUR SWORDS ADVENTURES CREDITS:")
@@ -367,12 +371,13 @@ def refresh_all_items(ctx: ZfsaContext):
                 gemtotal += amt*gemvalues[item - (BASE_ITEM_OFFSET+31)]
     
     gemtotal = int(gemtotal/100)
-    gemtotal -= ctx.received_tingle_traps*100
+    gemtotal -= ctx.received_tingle_traps*20
     if gemtotal < 0: gemtotal = 0
     if gemtotal != ctx.gemtotal:
         activate_gems(gemtotal - ctx.gemtotal, ctx)
     
-    ctx.is_first_item_sync = False
+    if ctx.ap_connected and ctx.is_first_item_sync:
+        ctx.is_first_item_sync = False
 
 
 def unpack_item(item, ctx, amt=0):
@@ -390,16 +395,16 @@ def unpack_item(item, ctx, amt=0):
         activate_jewel(item - (BASE_ITEM_OFFSET+21), ctx)
     elif item == BASE_ITEM_OFFSET+25:
         activate_maiden(amt, ctx)
-    elif BASE_ITEM_OFFSET+43 <= item <= BASE_ITEM_OFFSET+91:
-        activate_door(item, amt, ctx)
-    elif item == BASE_ITEM_OFFSET+96:
+    elif item == BASE_ITEM_OFFSET+46:
         activate_heart(amt, ctx)
-    elif item == BASE_ITEM_OFFSET+97:
+    elif item == BASE_ITEM_OFFSET+47:
         activate_fairy(amt, ctx)
-    elif item == BASE_ITEM_OFFSET+98:
+    elif item == BASE_ITEM_OFFSET+48:
         activate_tingle_trap(amt, ctx)
-    elif item == BASE_ITEM_OFFSET+99:
+    elif item == BASE_ITEM_OFFSET+49:
         activate_fire_trap(amt, ctx)
+    elif BASE_ITEM_OFFSET+51 <= item <= BASE_ITEM_OFFSET+100:
+        activate_door(item, amt, ctx)
 
 
 @dataclass
@@ -545,8 +550,9 @@ def set_fairy_amount(fairies, ctx):
 
 def activate_tingle_trap(amt, ctx):
     if ctx.received_tingle_traps >= amt: return
+    new_tingles = amt - ctx.received_tingle_traps
     ctx.received_tingle_traps = amt
-    show_message(f"Received Tingle Trap[CR]Tingle stole {amt*100} Force Gems!", ctx)
+    show_message(f"Received Tingle Trap\nTingle stole {new_tingles*20} Force Gems!", ctx)
 
 
 def activate_fire_trap(amt, ctx):

@@ -26,7 +26,7 @@ class ZfsaWorld(World):
     game = "The Legend of Zelda: Four Swords Adventures"
     web = ZfsaWebWorld()
 
-    data_version = 1
+    data_version = 2
 
     options_dataclass = ZfsaOptions
     options: ZfsaOptions
@@ -71,6 +71,8 @@ class ZfsaWorld(World):
     def create_item(self, name: str):
         if name in ALL_PROGRESSION_ITEMS:
             classification = ItemClassification.progression
+        elif name in TRAP_ITEMS:
+            classification = ItemClassification.trap
         else:
             classification = ItemClassification.filler
 

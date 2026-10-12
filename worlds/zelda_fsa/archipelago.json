@@ -1,6 +1,6 @@
 {
-	"compatible_version": 1,
-	"version": 1,
+	"compatible_version": 2,
+	"version": 2,
 	"game": "The Legend of Zelda: Four Swords Adventures",
 	"minimum_ap_version": "0.6.7"
 }
