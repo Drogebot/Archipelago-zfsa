@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING
 
 from BaseClasses import CollectionState, Region, ItemClassification
+from rule_builder.rules import And, Or, Has, CanReachRegion, True_
 from .items import ZfsaItem
 from .locations import ZfsaLocation
 from .static_logic import ALL_REGIONS, ZfsaRegion, Key, Chest, Requirements, ItemType
@@ -9,146 +10,219 @@ if TYPE_CHECKING:
     from . import ZfsaWorld
 
 
-def zfsa_requirements_satisfied(state: CollectionState, requirements: Requirements, world: "ZfsaWorld"):
-    my_items: ItemType = ItemType.none
-    if state.has("Progressive Pegasus Boots", world.player):
-        my_items |= ItemType.pegasus_boots
-    if state.has("Progressive Pegasus Boots", world.player, 2):
-        my_items |= ItemType.pegasus_bootsL2
-    if state.has("Progressive Lamp", world.player):
-        my_items |= ItemType.lamp
-    if state.has("Progressive Lamp", world.player, 2):
-        my_items |= ItemType.lampL2
-    if state.has("Progressive Boomerang", world.player):
-        my_items |= ItemType.boomerang
-    if state.has("Progressive Boomerang", world.player, 2):
-        my_items |= ItemType.boomerangL2
-    if state.has("Progressive Bow", world.player):
-        my_items |= ItemType.bow
-    if state.has("Progressive Bow", world.player, 2):
-        my_items |= ItemType.bowL2
-    if state.has("Progressive Magic Hammer", world.player):
-        my_items |= ItemType.magic_hammer
-    if state.has("Progressive Magic Hammer", world.player, 2):
-        my_items |= ItemType.magic_hammerL2
-    if state.has("Progressive Fire Rod", world.player):
-        my_items |= ItemType.fire_rod
-    if state.has("Progressive Fire Rod", world.player, 2):
-        my_items |= ItemType.fire_rodL2
-    if state.has("Progressive Roc's Feather", world.player):
-        my_items |= ItemType.rocs_feather
-    if state.has("Progressive Roc's Feather", world.player, 2):
-        my_items |= ItemType.rocs_featherL2
-    if state.has("Progressive Bombs", world.player):
-        my_items |= ItemType.bombs
-    if state.has("Progressive Bombs", world.player, 2):
-        my_items |= ItemType.bombsL2
-    if state.has("Progressive Shovel", world.player):
-        my_items |= ItemType.shovel
-    if state.has("Progressive Shovel", world.player, 2):
-        my_items |= ItemType.shovelL2
-    if state.has("Progressive Slingshot", world.player):
-        my_items |= ItemType.slingshot
-    if state.has("Progressive Slingshot", world.player, 2):
-        my_items |= ItemType.slingshotL2
+ITEM_RULES = (
+    (ItemType.pegasus_boots, Has("Progressive Pegasus Boots")),
+    (ItemType.pegasus_bootsL2, Has("Progressive Pegasus Boots", count=2)),
+    (ItemType.lamp, Has("Progressive Lamp")),
+    (ItemType.lampL2, Has("Progressive Lamp", count=2)),
+    (ItemType.boomerang, Has("Progressive Boomerang")),
+    (ItemType.boomerangL2, Has("Progressive Boomerang", count=2)),
+    (ItemType.bow, Has("Progressive Bow")),
+    (ItemType.bowL2, Has("Progressive Bow", count=2)),
+    (ItemType.magic_hammer, Has("Progressive Magic Hammer")),
+    (ItemType.magic_hammerL2, Has("Progressive Magic Hammer", count=2)),
+    (ItemType.fire_rod, Has("Progressive Fire Rod")),
+    (ItemType.fire_rodL2, Has("Progressive Fire Rod", count=2)),
+    (ItemType.rocs_feather, Has("Progressive Roc's Feather")),
+    (ItemType.rocs_featherL2, Has("Progressive Roc's Feather", count=2)),
+    (ItemType.bombs, Has("Progressive Bombs")),
+    (ItemType.bombsL2, Has("Progressive Bombs", count=2)),
+    (ItemType.shovel, Has("Progressive Shovel")),
+    (ItemType.shovelL2, Has("Progressive Shovel", count=2)),
+    (ItemType.slingshot, Has("Progressive Slingshot")),
+    (ItemType.slingshotL2, Has("Progressive Slingshot", count=2)),
+)
 
-    has_items: bool = len(requirements.items) == 0
-    for reqs in requirements.items:
-        has_set_items: bool = True
-        for req in reqs:
-            if my_items & req == ItemType(0):
-                has_set_items = False
-        if has_set_items:
-            has_items = True
-    if not has_items:
-        return False
 
-    if requirements.power_bracelet and not state.has("Power Bracelet", world.player):
-        return False
+def item_mask_rule(mask: ItemType):
+    """A rule satisfied by owning any item represented by this bitmask."""
+    rules = [
+        rule for item_flag, rule in ITEM_RULES
+        if mask & item_flag
+    ]
 
-    if requirements.jewels and not (state.has("Blue Royal Jewel", world.player) and state.has("Green Royal Jewel", world.player) and state.has("Red Royal Jewel", world.player) and state.has("Purple Royal Jewel", world.player)):
-        return False
+    if not rules:
+        return None
+
+    return Or(*rules)
+
+
+def zfsa_requirements_rule(requirements: Requirements, world: "ZfsaWorld"):
+    """Convert a ZFSA Requirements object into a rule-builder expression."""
+    rules = []
+
+    # Each inner set is an AND; the outer list is an OR.
+    # An empty requirements.items list means no item requirement.
+    if requirements.items:
+        item_set_rules = []
+
+        for item_set in requirements.items:
+            required_rules = [
+                item_mask_rule(item_mask)
+                for item_mask in item_set
+            ]
+
+            # An unknown/empty item mask cannot satisfy its requirement.
+            if any(rule is None for rule in required_rules):
+                item_set_rules.append(None)
+            else:
+                item_set_rules.append(And(*required_rules))
+
+        valid_item_sets = [
+            rule for rule in item_set_rules if rule is not None
+        ]
+
+        if not valid_item_sets:
+            # No valid alternative can satisfy the item requirement.
+            from rule_builder.rules import False_
+            rules.append(False_())
+        else:
+            rules.append(Or(*valid_item_sets))
+
+    if requirements.power_bracelet:
+        rules.append(Has("Power Bracelet"))
+
+    if requirements.jewels:
+        rules.append(And(
+            Has("Blue Royal Jewel"),
+            Has("Green Royal Jewel"),
+            Has("Red Royal Jewel"),
+            Has("Purple Royal Jewel"),
+        ))
 
     for key in requirements.keys:
-        if not state.has(key.name, world.player, key.amount):
-            return False
-    
-    if requirements.special_the_mountain_path and not (state.has("Power Bracelet", world.player) or state.has("Progressive Lamp", world.player) or state.has("Progressive Magic Hammer", world.player) or state.has("Progressive Fire Rod", world.player)):
-        return False
-    if requirements.special_the_swamp and not (state.has("The Swamp Moon Gate", world.player) or state.has("Progressive Roc's Feather", world.player, 2) or state.has("Progressive Pegasus Boots", world.player, 2)):
-        return False
-    if requirements.special_temple_of_darkness and not (state.has("Temple of Darkness Progressive Key", world.player) or state.has("Progressive Roc's Feather", world.player)):
-        return False
-    if requirements.special_palace_of_winds and not (state.has("Palace of Winds Progressive 2F North Key", world.player, 2) or (state.has("Progressive Roc's Feather", world.player) or state.has("Progressive Pegasus Boots", world.player, 2)) and state.has("Progressive Bombs", world.player)):
-        return False
-    
-    #options
-    if world.options.lamp_for_dark and requirements.lamp_for_dark and my_items & (ItemType.lamp) == ItemType(0):
-        return False
-    
+        rules.append(Has(key.name, count=key.amount))
+
+    if requirements.special_the_mountain_path:
+        rules.append(Or(
+            Has("Power Bracelet"),
+            Has("Progressive Lamp"),
+            Has("Progressive Magic Hammer"),
+            Has("Progressive Fire Rod"),
+        ))
+
+    if requirements.special_the_swamp:
+        rules.append(Or(
+            Has("The Swamp Moon Gate"),
+            Has("Progressive Roc's Feather", count=2),
+            Has("Progressive Pegasus Boots", count=2),
+        ))
+
+    if requirements.special_temple_of_darkness:
+        rules.append(Or(
+            Has("Temple of Darkness Progressive Key"),
+            Has("Progressive Roc's Feather"),
+        ))
+
+    if requirements.special_palace_of_winds:
+        rules.append(Or(
+            Has("Palace of Winds Progressive 2F North Key", count=2),
+            And(
+                Or(
+                    Has("Progressive Roc's Feather"),
+                    Has("Progressive Pegasus Boots", count=2),
+                ),
+                Has("Progressive Bombs"),
+            ),
+        ))
+
+    # Options are evaluated while building the rule.
+    if world.options.lamp_for_dark and requirements.lamp_for_dark:
+        rules.append(
+            Or(
+                Has("Progressive Lamp"),
+                Has(world.glitches_item_name),
+            )
+        )
+
     if not world.options.minor_tricks:
-        if requirements.projectile_regroup and my_items & (ItemType.bow | ItemType.fire_rod | ItemType.rocs_feather | ItemType.bombs | ItemType.slingshot | ItemType.pegasus_bootsL2) == ItemType(0):
-            return False
-        if requirements.bomb_regroup and my_items & (ItemType.bombs)  == ItemType(0):
-            return False
-        if requirements.helmaroc_regroup and my_items & (ItemType.magic_hammer | ItemType.bombs) == ItemType(0):
-            return False
-        if requirements.bowless_gohma and my_items & (ItemType.bow) == ItemType(0):
-            return False
-        if requirements.jump_pound and my_items & (ItemType.rocs_feather | ItemType.bombs) == ItemType(0):
-            return False
-        if requirements.jump_pound_side and my_items & (ItemType.pegasus_boots | ItemType.rocs_feather | ItemType.bombs) == ItemType(0):
-            return False
-    
-    return True
+        trick_rules = []
+
+        if requirements.projectile_regroup:
+            trick_rules.append(Or(
+                Has("Progressive Bow"),
+                Has("Progressive Fire Rod"),
+                Has("Progressive Roc's Feather"),
+                Has("Progressive Bombs"),
+                Has("Progressive Slingshot"),
+                Has("Progressive Pegasus Boots", count=2),
+            ))
+
+        if requirements.bomb_regroup:
+            trick_rules.append(Has("Progressive Bombs"))
+
+        if requirements.helmaroc_regroup:
+            trick_rules.append(Or(
+                Has("Progressive Magic Hammer"),
+                Has("Progressive Bombs"),
+            ))
+
+        if requirements.bowless_gohma:
+            trick_rules.append(Has("Progressive Bow"))
+
+        if requirements.jump_pound:
+            trick_rules.append(Or(
+                Has("Progressive Roc's Feather"),
+                Has("Progressive Bombs"),
+            ))
+
+        if requirements.jump_pound_side:
+            trick_rules.append(Or(
+                Has("Progressive Pegasus Boots"),
+                Has("Progressive Roc's Feather"),
+                Has("Progressive Bombs"),
+            ))
+
+        if trick_rules:
+            rules.append(
+                Or(
+                    And(*trick_rules),
+                    Has(world.glitches_item_name),
+                )
+            )
+
+    return And(*rules) if rules else True_()
 
 
-def zfsa_can_get_key(state: CollectionState, key: Key, world: "ZfsaWorld"):
-    return zfsa_requirements_satisfied(state, key.requirements, world)
+def zfsa_key_rule(key: Key, world: "ZfsaWorld"):
+    return zfsa_requirements_rule(key.requirements, world)
 
 
-def zfsa_can_get_chest(state: CollectionState, chest: Chest, world: "ZfsaWorld"):
-    return zfsa_requirements_satisfied(state, chest.requirements, world)
+def zfsa_chest_rule(chest: Chest, world: "ZfsaWorld"):
+    return zfsa_requirements_rule(chest.requirements, world)
 
 
-def zfsa_can_use_entrance(state: CollectionState, region: ZfsaRegion, parent, ticket, world: "ZfsaWorld"):
-    if region.requirements.jewels and not (state.has("Blue Royal Jewel", world.player) and state.has("Green Royal Jewel", world.player) and state.has("Red Royal Jewel", world.player) and state.has("Purple Royal Jewel", world.player)):
-        return False
-    #return True
+def zfsa_entrance_rule(region: ZfsaRegion, parent, ticket, world: "ZfsaWorld"):
+    rules = []
+
+    if region.requirements.jewels:
+        rules.append(And(
+            Has("Blue Royal Jewel"),
+            Has("Green Royal Jewel"),
+            Has("Red Royal Jewel"),
+            Has("Purple Royal Jewel"),
+        ))
+
     if world.options.level_access == 1:
-        if ticket is None:
-            return True
-        else:
-            (ticket_name, ticket_number) = ticket
-            return state.has(ticket_name, world.player, ticket_number)
-    else:
-        if region.parentRegion is None:
-            return True
-        else:
-            return state.can_reach_region(parent.name, world.player) and zfsa_requirements_satisfied(state, parent.requirements, world)
+        if ticket is not None:
+            ticket_name, ticket_number = ticket
+            rules.append(Has(ticket_name, count=ticket_number))
+    elif region.parentRegion is not None:
+        rules.append(CanReachRegion(parent.name))
+        rules.append(zfsa_requirements_rule(parent.requirements, world))
 
-
-def make_key_lambda(key: Key, world: "ZfsaWorld"):
-    return lambda state: zfsa_can_get_key(state, key, world)
-
-
-def make_chest_lambda(chest: Chest, world: "ZfsaWorld"):
-    return lambda state: zfsa_can_get_chest(state, chest, world)
-
-
-def make_entrance_lambda(region: ZfsaRegion, parent, ticket, world: "ZfsaWorld"):
-    return lambda state: zfsa_can_use_entrance(state, region, parent, ticket, world)
+    return And(*rules) if rules else True_()
 
 
 def create_region(region: ZfsaRegion, world: "ZfsaWorld"):
     new_region = Region(region.name, world.player, world.multiworld)
     #for key in region.keys:
     #    new_location = ZfsaLocation(world.player, f"{region.name} - {key.name}", key.id, new_region)
-    #    new_location.access_rule = make_key_lambda(key, world)
+    #    world.set_rule(new_location, zfsa_key_rule(key, world))
     #    new_region.locations.append(new_location)
     for chest in region.chests:
         new_location = ZfsaLocation(world.player, f"{region.name} - {chest.name}", chest.id, new_region)
-        new_location.access_rule = make_chest_lambda(chest, world)
+        world.set_rule(new_location, zfsa_chest_rule(chest, world))
         new_region.locations.append(new_location)
     
     location_name = f"{region.name} - Stage Clear"
@@ -158,13 +232,13 @@ def create_region(region: ZfsaRegion, world: "ZfsaWorld"):
         location_id = None
     
     new_location = ZfsaLocation(world.player, location_name, location_id, new_region)
-    new_location.access_rule = lambda state: zfsa_requirements_satisfied(state, region.requirements, world)
+    world.set_rule(new_location, zfsa_requirements_rule(region.requirements, world))
     new_region.locations.append(new_location)
     
     if region.name == "Palace of Winds":
         event_item = ZfsaItem("Victory", ItemClassification.progression, None, world.player)
         new_location.place_locked_item(event_item)
-        world.multiworld.completion_condition[world.player] = lambda state: state.has("Victory", world.player)
+        world.set_completion_rule(Has("Victory"))
 
     return new_region
 
@@ -178,7 +252,14 @@ def create_regions(world: "ZfsaWorld"):
         region = ALL_REGIONS[region_name]
         regions[region.name] = create_region(region, world)
         parent = None if region.parentRegion is None else ALL_REGIONS[region.parentRegion]
-        ticket = (f"Progressive Level {(int(region.stageId/10))} Ticket", 2 if region.stageId%10 == 3 else 1) if region.stageId%10 > 0 else None
-        regions["Menu"].connect(regions[region.name], None, make_entrance_lambda(region, parent, ticket, world))
+        ticket = (
+            (
+                f"Progressive Level {(int(region.stageId/10))} Ticket",
+                2 if region.stageId%10 == 3 else 1
+            )
+            if region.stageId%10 > 0
+            else None
+        )
+        world.create_entrance(regions["Menu"], regions[region.name], zfsa_entrance_rule(region, parent, ticket, world))
 
     world.multiworld.regions += regions.values()

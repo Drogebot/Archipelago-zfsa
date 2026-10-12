@@ -121,6 +121,7 @@ class ZfsaContext(CommonContext):
     received_fairies = 0
     remaining_fairies = 0
     fairy_storage_loaded = False
+    fairy_storage_applied = False
     save_fairies = False
     received_tingle_traps = 0
     received_fire_traps = 0
@@ -204,14 +205,15 @@ async def game_watcher(ctx: ZfsaContext):
         fairy_key_received = get_fairy_storage_key_received(ctx)
         fairy_key_remaining = get_fairy_storage_key_remaining(ctx)
         if fairy_key_received in ctx.stored_data and fairy_key_remaining in ctx.stored_data and not ctx.fairy_storage_loaded:
+            ctx.fairy_storage_loaded = True
             received = ctx.stored_data[fairy_key_received]
             remaining = ctx.stored_data[fairy_key_remaining]
             if received != None and remaining != None:
                 ctx.received_fairies = int(received)
                 ctx.remaining_fairies = int(remaining)
             logger.info(f"Loaded {ctx.remaining_fairies} fairies from Data Storage")
-            set_fairy_amount(ctx.remaining_fairies, ctx)
-            ctx.fairy_storage_loaded = True
+        if ctx.fairy_storage_loaded and not ctx.fairy_storage_applied:
+            ctx.fairy_storage_applied = set_fairy_amount(ctx.remaining_fairies, ctx)
         if ctx.save_fairies:
             ctx.save_fairies = False
             await save_fairy_count(ctx)
@@ -378,6 +380,13 @@ def refresh_all_items(ctx: ZfsaContext):
     
     if ctx.ap_connected and ctx.is_first_item_sync:
         ctx.is_first_item_sync = False
+        for loc_id in ctx.checked_locations:
+            if loc_id in LOCMAP_BY_LOCATIONID:
+                LOCMAP_BY_LOCATIONID[loc_id].checked = True
+            else:
+                for loc in STAGEMAP.values():
+                    if loc_id == loc.location_id:
+                        loc.checked = True
 
 
 def unpack_item(item, ctx, amt=0):
@@ -498,6 +507,7 @@ def activate_door(id, amt, ctx):
 
 def activate_gems(amt, ctx):
     ctx.gemtotal += amt
+    if ctx.is_first_item_sync: return
     if ctx.dolphin_status == CONNECTION_CONNECTED_STATUS: #Gravi01  change to connection status
         show_message(f"Received {amt} Force Gems", ctx)
         
@@ -543,9 +553,13 @@ def activate_fairy(amt, ctx):
 
 def set_fairy_amount(fairies, ctx):
     if ctx.dolphin_status == CONNECTION_CONNECTED_STATUS: #Gravi01  change to connection status
+        game_state = dme.read_word(addresses.ZFSA_GAME_STATE)
+        if game_state < 6: return False
         fairies = fairies & 0b111111
         dme.write_word(addresses.ZFSA_LEVEL_FAIRIES, fairies)
         dme.write_byte(addresses.ZFSA_SAVE_FAIRIES, fairies)
+        return True
+    return False
 
 
 def activate_tingle_trap(amt, ctx):
@@ -609,6 +623,7 @@ class DoorInfo:
 
 
 STAGEMAP: dict[int, LocationInfo] = {}
+LOCMAP_BY_LOCATIONID: dict[int, LocationInfo] = {}
 LOCMAP: dict[int, list[LocationInfo]] = {}
 DOORMAP_BY_ITEMID: dict[int, list[DoorInfo]] = {}
 DOORMAP: dict[int, list[DoorInfo]] = {}
@@ -618,7 +633,9 @@ def create_location_memory_map():
         STAGEMAP[region.stageId] = LocationInfo(region.id, None)
         LOCMAP[region.stageId] = []
         for chest in region.chests:
-            LOCMAP[region.stageId].append(LocationInfo(chest.id, chest.flagId))
+            loc = LocationInfo(chest.id, chest.flagId)
+            LOCMAP_BY_LOCATIONID[chest.id] = loc
+            LOCMAP[region.stageId].append(loc)
         DOORMAP[region.stageId] = []
         for door in region.doors:
             (item_id, _) = ALL_ITEMS_TABLE[door.key]
@@ -651,14 +668,23 @@ async def handle_stage_select(ctx):
                     if not ctx.ticket_mode:
                         ticket_id = (i >> 2)*2 + (1 if (i & 0b11) > 0 else 0)
                         TICKETS[ticket_id].active = True
+                elif not beaten and loc.checked:
+                    stage_flags |= 1 << i
+                    dme.write_word(addresses.ZFSA_SAVE_STAGES, stage_flags)
+                    if not ctx.ticket_mode:
+                        ticket_id = (i >> 2)*2 + (1 if (i & 0b11) > 0 else 0)
+                        TICKETS[ticket_id].active = True
             
             #fairy sync
-            save_fairies = dme.read_byte(addresses.ZFSA_SAVE_FAIRIES)
-            level_fairies = dme.read_word(addresses.ZFSA_LEVEL_FAIRIES)
-            if level_fairies != save_fairies:
-                dme.write_byte(addresses.ZFSA_SAVE_FAIRIES, level_fairies)
-                ctx.remaining_fairies = level_fairies
-                ctx.save_fairies = True
+            if game_state < 6:
+                ctx.fairy_storage_applied = False
+            else:
+                save_fairies = dme.read_byte(addresses.ZFSA_SAVE_FAIRIES)
+                level_fairies = dme.read_word(addresses.ZFSA_LEVEL_FAIRIES)
+                if level_fairies != save_fairies:
+                    dme.write_byte(addresses.ZFSA_SAVE_FAIRIES, level_fairies)
+                    ctx.remaining_fairies = level_fairies
+                    ctx.save_fairies = True
             
             if game_state != 6 or menu_adr == 0:
                 was_in_menu = False
@@ -778,7 +804,7 @@ async def handle_link(ctx):
                     link_adr = dme.read_word(link_arr_adr + addresses.ZFSA_LINK_ARR_OFFSET)
                     if link_adr > 0:
                         #link state legal
-                        if prev_game_state < 7:
+                        if prev_game_state < 7 and prev_game_state != 0:
                             dme.write_word(link_adr + addresses.ZFSA_LINK_GEMS_OFFSET, ctx.gemtotal)
                         dme.write_byte(link_adr + addresses.ZFSA_LINK_POWER_BRACELET_OFFSET, 1 if (ctx.has_power_bracelet and not (ctx.current_level == 53 and ctx.current_screen == 43)) else 0)
                         dme.write_byte(link_adr + addresses.ZFSA_LINK_BLUE_BRACELET_OFFSET, 1 if ctx.has_blue_bracelet else 0)

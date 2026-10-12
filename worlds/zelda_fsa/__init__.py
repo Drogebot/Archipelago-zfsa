@@ -36,6 +36,8 @@ class ZfsaWorld(World):
         for name, data in ALL_ITEMS_TABLE.items()
     }
     location_name_to_id = ALL_LOCATIONS_TABLE
+    
+    glitches_item_name = "Universal Tracker Glitched Logic"
 
     def generate_early(self):
         temp = False
@@ -69,6 +71,9 @@ class ZfsaWorld(World):
         self.multiworld.itempool += pool
 
     def create_item(self, name: str):
+        if name == self.glitches_item_name:
+            return ZfsaItem(name, ItemClassification.progression, None, self.player)
+        
         if name in ALL_PROGRESSION_ITEMS:
             classification = ItemClassification.progression
         elif name in TRAP_ITEMS:
