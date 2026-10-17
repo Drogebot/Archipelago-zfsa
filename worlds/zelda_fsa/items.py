@@ -108,9 +108,9 @@ LEVEL_PROGRESSION_ITEMS: dict[str, tuple[int, int]] = {
     "The Field Stange Cave Key": (BASE_ITEM_OFFSET+69, 1), # junk
     "The Swamp Moon Gate": (BASE_ITEM_OFFSET+70, 1),
     "The Swamp Progressive Graveyard East Key": (BASE_ITEM_OFFSET+71, 2), # need 2
-    "Infiltrantion of Hyrule Castle Lower Jail Key": (BASE_ITEM_OFFSET+72, 1), # junk, shortcut
-    "Infiltrantion of Hyrule Castle Basement Stairs Moon Gate": (BASE_ITEM_OFFSET+73, 1),
-    "Infiltrantion of Hyrule Castle Progressive Basement Key": (BASE_ITEM_OFFSET+74, 3), # need 3, 3rd is junk
+    "Infiltration of Hyrule Castle Lower Jail Key": (BASE_ITEM_OFFSET+72, 1), # junk, shortcut
+    "Infiltration of Hyrule Castle Basement Stairs Moon Gate": (BASE_ITEM_OFFSET+73, 1),
+    "Infiltration of Hyrule Castle Progressive Basement Key": (BASE_ITEM_OFFSET+74, 3), # need 3, 3rd is junk
     "Lost Woods East Woods Moon Gate": (BASE_ITEM_OFFSET+75, 1),
     "Lost Woods North Woods Storage Key": (BASE_ITEM_OFFSET+76, 1), # junk
     "Lost Woods South Woods Storage Key": (BASE_ITEM_OFFSET+77, 1), # junk

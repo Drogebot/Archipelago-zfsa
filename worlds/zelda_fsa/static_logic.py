@@ -351,9 +351,9 @@ ALL_REGIONS: dict[str, ZfsaRegion] = {
         Door("The Swamp Progressive Graveyard East Key", 2, DoorType.door, LocationFlag(1,5,6,33)),
     ], parentRegion="The Field"),
     
-    "Infiltration of Hyrule Castle": ZfsaRegion("Infiltration of Hyrule Castle", 43, BASE_LOCATION_OFFSET+164, Requirements([[ItemType.bow | ItemType.fire_rod | ItemType.pegasus_bootsL2, ItemType.lamp | ItemType.fire_rod]], keys=[KeyType("Infiltrantion of Hyrule Castle Progressive Basement Key", 2)]), [
+    "Infiltration of Hyrule Castle": ZfsaRegion("Infiltration of Hyrule Castle", 43, BASE_LOCATION_OFFSET+164, Requirements([[ItemType.bow | ItemType.fire_rod | ItemType.pegasus_bootsL2, ItemType.lamp | ItemType.fire_rod]], keys=[KeyType("Infiltration of Hyrule Castle Progressive Basement Key", 2)]), [
         Key("Outside Jail Key", BASE_LOCATION_OFFSET+165, LocationFlag(4,6,0,16), Requirements([[ItemType.boomerang]])),
-        Key("Basement Stairs Room Pearl", BASE_LOCATION_OFFSET+166, LocationFlag(0,3,0,15), Requirements([], keys=[KeyType("Infiltrantion of Hyrule Castle Progressive Basement Key")])),
+        Key("Basement Stairs Room Pearl", BASE_LOCATION_OFFSET+166, LocationFlag(0,3,0,15), Requirements([], keys=[KeyType("Infiltration of Hyrule Castle Progressive Basement Key")])),
     ], [
         Chest("Outside Jail Chest", BASE_LOCATION_OFFSET+167, LocationFlag(4,6,5,7), Requirements()),
         Chest("Wall East Chest 1", BASE_LOCATION_OFFSET+168, LocationFlag(2,5,0,0), Requirements()),
@@ -361,23 +361,23 @@ ALL_REGIONS: dict[str, ZfsaRegion] = {
         Chest("Wall West Chest 1", BASE_LOCATION_OFFSET+170, LocationFlag(1,5,0,0), Requirements()),
         Chest("Wall West Chest 2", BASE_LOCATION_OFFSET+171, LocationFlag(1,5,0,1), Requirements()),
         Chest("Basement Stairs Room Chest", BASE_LOCATION_OFFSET+172, LocationFlag(0,3,0,0), Requirements()),
-        Chest("Basement Stairs Room Moon Gate Chest", BASE_LOCATION_OFFSET+173, LocationFlag(0,3,1,0), Requirements([], keys=[KeyType("Infiltrantion of Hyrule Castle Basement Stairs Moon Gate")])),
+        Chest("Basement Stairs Room Moon Gate Chest", BASE_LOCATION_OFFSET+173, LocationFlag(0,3,1,0), Requirements([], keys=[KeyType("Infiltration of Hyrule Castle Basement Stairs Moon Gate")])),
         #Chest("Basement Stairs Room Chest 3", BASE_LOCATION_OFFSET+174, LocationFlag(0,3,2,0), Requirements()),# not accessable?
         #Chest("Basement Stairs Room Chest 4", BASE_LOCATION_OFFSET+175, LocationFlag(0,3,2,1), Requirements()),# not accessable?
-        Chest("Eye Void Room Chest 1", BASE_LOCATION_OFFSET+176, LocationFlag(1,3,0,0), Requirements([], keys=[KeyType("Infiltrantion of Hyrule Castle Progressive Basement Key")])),
-        Chest("Eye Void Room Chest 2", BASE_LOCATION_OFFSET+177, LocationFlag(1,3,0,1), Requirements([], keys=[KeyType("Infiltrantion of Hyrule Castle Progressive Basement Key")])),
-        Chest("Eye Void Room Chest 3", BASE_LOCATION_OFFSET+178, LocationFlag(1,3,0,2), Requirements([], keys=[KeyType("Infiltrantion of Hyrule Castle Progressive Basement Key")])),
-        Chest("Yard Jail Chest", BASE_LOCATION_OFFSET+179, LocationFlag(4,5,5,8), Requirements([[ItemType.bow | ItemType.fire_rod | ItemType.pegasus_bootsL2]], keys=[KeyType("Infiltrantion of Hyrule Castle Progressive Basement Key", 2)])),
-        Chest("Yard Chest 1", BASE_LOCATION_OFFSET+180, LocationFlag(2,4,0,0), Requirements([[ItemType.bow | ItemType.fire_rod | ItemType.pegasus_bootsL2]], keys=[KeyType("Infiltrantion of Hyrule Castle Progressive Basement Key", 2)])),
-        Chest("Yard Chest 2", BASE_LOCATION_OFFSET+181, LocationFlag(2,4,0,1), Requirements([[ItemType.bow | ItemType.fire_rod | ItemType.pegasus_bootsL2]], keys=[KeyType("Infiltrantion of Hyrule Castle Progressive Basement Key", 2)])),
-        #Chest("Fire Void Room Chest 1", BASE_LOCATION_OFFSET+182, LocationFlag(2,3,7,0), Requirements([], keys=[KeyType("Infiltrantion of Hyrule Castle Progressive Basement Key", 2)])),# not accessable?
-        #Chest("Fire Void Room Chest 2", BASE_LOCATION_OFFSET+183, LocationFlag(2,3,7,1), Requirements([], keys=[KeyType("Infiltrantion of Hyrule Castle Progressive Basement Key", 2)])),# not accessable?
+        Chest("Eye Void Room Chest 1", BASE_LOCATION_OFFSET+176, LocationFlag(1,3,0,0), Requirements([], keys=[KeyType("Infiltration of Hyrule Castle Progressive Basement Key")])),
+        Chest("Eye Void Room Chest 2", BASE_LOCATION_OFFSET+177, LocationFlag(1,3,0,1), Requirements([], keys=[KeyType("Infiltration of Hyrule Castle Progressive Basement Key")])),
+        Chest("Eye Void Room Chest 3", BASE_LOCATION_OFFSET+178, LocationFlag(1,3,0,2), Requirements([], keys=[KeyType("Infiltration of Hyrule Castle Progressive Basement Key")])),
+        Chest("Yard Jail Chest", BASE_LOCATION_OFFSET+179, LocationFlag(4,5,5,8), Requirements([[ItemType.bow | ItemType.fire_rod | ItemType.pegasus_bootsL2]], keys=[KeyType("Infiltration of Hyrule Castle Progressive Basement Key", 2)])),
+        Chest("Yard Chest 1", BASE_LOCATION_OFFSET+180, LocationFlag(2,4,0,0), Requirements([[ItemType.bow | ItemType.fire_rod | ItemType.pegasus_bootsL2]], keys=[KeyType("Infiltration of Hyrule Castle Progressive Basement Key", 2)])),
+        Chest("Yard Chest 2", BASE_LOCATION_OFFSET+181, LocationFlag(2,4,0,1), Requirements([[ItemType.bow | ItemType.fire_rod | ItemType.pegasus_bootsL2]], keys=[KeyType("Infiltration of Hyrule Castle Progressive Basement Key", 2)])),
+        #Chest("Fire Void Room Chest 1", BASE_LOCATION_OFFSET+182, LocationFlag(2,3,7,0), Requirements([], keys=[KeyType("Infiltration of Hyrule Castle Progressive Basement Key", 2)])),# not accessable?
+        #Chest("Fire Void Room Chest 2", BASE_LOCATION_OFFSET+183, LocationFlag(2,3,7,1), Requirements([], keys=[KeyType("Infiltration of Hyrule Castle Progressive Basement Key", 2)])),# not accessable?
     ], [
-        Door("Infiltrantion of Hyrule Castle Lower Jail Key", 1, DoorType.door, LocationFlag(4,6,0,0)),
-        Door("Infiltrantion of Hyrule Castle Basement Stairs Moon Gate", 1, DoorType.moon_gate, LocationFlag(0,3,0,36)),
-        Door("Infiltrantion of Hyrule Castle Progressive Basement Key", 1, DoorType.door, LocationFlag(0,3,0,2)),
-        Door("Infiltrantion of Hyrule Castle Progressive Basement Key", 2, DoorType.door, LocationFlag(1,3,0,6)),
-        Door("Infiltrantion of Hyrule Castle Progressive Basement Key", 3, DoorType.door, LocationFlag(2,3,0,0)),
+        Door("Infiltration of Hyrule Castle Lower Jail Key", 1, DoorType.door, LocationFlag(4,6,0,0)),
+        Door("Infiltration of Hyrule Castle Basement Stairs Moon Gate", 1, DoorType.moon_gate, LocationFlag(0,3,0,36)),
+        Door("Infiltration of Hyrule Castle Progressive Basement Key", 1, DoorType.door, LocationFlag(0,3,0,2)),
+        Door("Infiltration of Hyrule Castle Progressive Basement Key", 2, DoorType.door, LocationFlag(1,3,0,6)),
+        Door("Infiltration of Hyrule Castle Progressive Basement Key", 3, DoorType.door, LocationFlag(2,3,0,0)),
     ], parentRegion="The Swamp"),
     
     

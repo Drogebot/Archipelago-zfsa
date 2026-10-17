@@ -2,7 +2,7 @@ from typing import TYPE_CHECKING
 
 from BaseClasses import CollectionState, Region, ItemClassification
 from rule_builder.rules import And, Or, Has, CanReachRegion, True_
-from .items import ZfsaItem
+from .items import ZfsaItem, TICKET_ITEMS
 from .locations import ZfsaLocation
 from .static_logic import ALL_REGIONS, ZfsaRegion, Key, Chest, Requirements, ItemType
 
@@ -10,7 +10,7 @@ if TYPE_CHECKING:
     from . import ZfsaWorld
 
 
-ITEM_RULES = (
+ITEM_RULES = [
     (ItemType.pegasus_boots, Has("Progressive Pegasus Boots")),
     (ItemType.pegasus_bootsL2, Has("Progressive Pegasus Boots", count=2)),
     (ItemType.lamp, Has("Progressive Lamp")),
@@ -31,7 +31,7 @@ ITEM_RULES = (
     (ItemType.shovelL2, Has("Progressive Shovel", count=2)),
     (ItemType.slingshot, Has("Progressive Slingshot")),
     (ItemType.slingshotL2, Has("Progressive Slingshot", count=2)),
-)
+]
 
 
 def item_mask_rule(mask: ItemType):
@@ -128,12 +128,10 @@ def zfsa_requirements_rule(requirements: Requirements, world: "ZfsaWorld"):
 
     # Options are evaluated while building the rule.
     if world.options.lamp_for_dark and requirements.lamp_for_dark:
-        rules.append(
-            Or(
-                Has("Progressive Lamp"),
-                Has(world.glitches_item_name),
-            )
-        )
+        rules.append(Or(
+            Has("Progressive Lamp"),
+            Has(world.glitches_item_name),
+        ))
 
     if not world.options.minor_tricks:
         trick_rules = []
@@ -174,12 +172,10 @@ def zfsa_requirements_rule(requirements: Requirements, world: "ZfsaWorld"):
             ))
 
         if trick_rules:
-            rules.append(
-                Or(
-                    And(*trick_rules),
-                    Has(world.glitches_item_name),
-                )
-            )
+            rules.append(Or(
+                And(*trick_rules),
+                Has(world.glitches_item_name),
+            ))
 
     return And(*rules) if rules else True_()
 
@@ -207,7 +203,7 @@ def zfsa_entrance_rule(region: ZfsaRegion, parent, ticket, world: "ZfsaWorld"):
         if ticket is not None:
             ticket_name, ticket_number = ticket
             rules.append(Has(ticket_name, count=ticket_number))
-    elif region.parentRegion is not None:
+    elif parent is not None:
         rules.append(CanReachRegion(parent.name))
         rules.append(zfsa_requirements_rule(parent.requirements, world))
 
@@ -239,6 +235,15 @@ def create_region(region: ZfsaRegion, world: "ZfsaWorld"):
         event_item = ZfsaItem("Victory", ItemClassification.progression, None, world.player)
         new_location.place_locked_item(event_item)
         world.set_completion_rule(Has("Victory"))
+    elif world.options.level_access != 1:
+        ticket = (
+            f"Progressive Level {(int(region.stageId/10))} Ticket"
+            if region.stageId%10 < 3
+            else None
+        )
+        if ticket is not None:
+            ticket_id, _ = TICKET_ITEMS[ticket]
+            new_location.place_locked_item(ZfsaItem(ticket, ItemClassification.progression, ticket_id, world.player))
 
     return new_region
 
@@ -247,11 +252,11 @@ def create_regions(world: "ZfsaWorld"):
     regions = {
         "Menu": Region("Menu", world.player, world.multiworld)
     }
+    world.multiworld.regions.append(regions["Menu"])
 
     for region_name in ALL_REGIONS:
         region = ALL_REGIONS[region_name]
         regions[region.name] = create_region(region, world)
-        parent = None if region.parentRegion is None else ALL_REGIONS[region.parentRegion]
         ticket = (
             (
                 f"Progressive Level {(int(region.stageId/10))} Ticket",
@@ -260,6 +265,6 @@ def create_regions(world: "ZfsaWorld"):
             if region.stageId%10 > 0
             else None
         )
+        parent = None if region.parentRegion is None else ALL_REGIONS[region.parentRegion]
         world.create_entrance(regions["Menu"], regions[region.name], zfsa_entrance_rule(region, parent, ticket, world))
-
-    world.multiworld.regions += regions.values()
+        world.multiworld.regions.append(regions[region.name])

@@ -11,7 +11,7 @@ import ModuleUpdate
 from .options import ZfsaOptions
 from .bit_helper import change_endian, bit_flagger, extract_bits
 import dolphin_memory_engine as dme
-from . import addresses
+from . import addresses, WORLD_VERSION
 from .static_logic import ALL_REGIONS, DoorType
 from .items import ALL_ITEMS_TABLE
 
@@ -107,7 +107,8 @@ class ZfsaContext(CommonContext):
     starting_health = 16
     current_health = 16
     current_level = 0
-    current_screen = -1
+    current_screen = 0
+    current_layer = 0
     reset_doors = False
     victory = False
     
@@ -591,16 +592,18 @@ def show_message(message, ctx):
     ctx.queued_messages.append(message)
 
 # Checks to see if player changed stages to update map_id for Poptracker
-async def send_map_id(map_id, ctx):
-    if map_id == ctx.current_level:
+async def send_map_id(map_id, screen_id, layer_id, ctx):
+    if map_id == ctx.current_level and screen_id == ctx.current_screen and layer_id == ctx.current_layer:
         return
     ctx.current_level = map_id
+    ctx.current_screen = screen_id
+    ctx.current_layer = layer_id
     await ctx.send_msgs([{
         "cmd": "Set",
         "key": f"zfsa_map_{ctx.team}_{ctx.slot}",
         "default": 0,
         "want_reply": False,
-        "operations": [{"operation": "replace", "value": map_id}]
+        "operations": [{"operation": "replace", "value": f"{map_id}:{screen_id}:{layer_id}"}]
     }])
 
 
@@ -717,7 +720,7 @@ async def handle_stage(ctx):
                 if game_state < 7 or stage_ptr_ptr_adr == 0:
                     prev_level = 0
                     prev_screen = -1
-                    await send_map_id(0, ctx)
+                    await send_map_id(0, 0, 0, ctx)
                 else:
                     stage_ptr_adr = dme.read_word(stage_ptr_ptr_adr + addresses.ZFSA_STAGE_PTR_OFFSET)
                     if stage_ptr_adr > 0:
@@ -727,9 +730,8 @@ async def handle_stage(ctx):
                             levelid = dme.read_word(stage_adr + addresses.ZFSA_STAGE_LEVELID_OFFSET)
                             stageid = dme.read_word(stage_adr + addresses.ZFSA_STAGE_STAGEID_OFFSET)
                             cur_screen = dme.read_word(stage_adr + addresses.ZFSA_STAGE_SCREEN_X_OFFSET) + dme.read_word(stage_adr + addresses.ZFSA_STAGE_SCREEN_Y_OFFSET)*10
-                            ctx.current_screen = cur_screen
                             cur_level = levelid*10 + 10 + stageid
-                            await send_map_id(cur_level, ctx)
+                            await send_map_id(cur_level, cur_screen, ctx.current_layer, ctx)
                             
                             #jewels & maidens
                             dme.write_byte(stage_adr + addresses.ZFSA_STAGE_JEWELS_OFFSET, ctx.jewels)
@@ -812,6 +814,10 @@ async def handle_link(ctx):
                         health = dme.read_word(link_adr + addresses.ZFSA_LINK_HEALTH_OFFSET)
                         if health > ctx.current_health:
                             dme.write_word(link_adr + addresses.ZFSA_LINK_HEALTH_OFFSET, ctx.current_health)
+                        
+                        #poptracker
+                        cur_layer = dme.read_word(link_adr + addresses.ZFSA_LINK_LAYER_OFFSET) & 0b111
+                        await send_map_id(ctx.current_level, ctx.current_screen, cur_layer, ctx)
                         
                         #deathlink
                         if health <= 0:

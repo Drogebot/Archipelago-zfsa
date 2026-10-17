@@ -14,6 +14,9 @@ from .options import ZfsaOptions
 from .regions import create_regions
 
 
+WORLD_VERSION = "0.0.7"
+
+
 class ZfsaWebWorld(WebWorld):
     theme = "grass"
 
@@ -25,8 +28,6 @@ class ZfsaWorld(World):
     """
     game = "The Legend of Zelda: Four Swords Adventures"
     web = ZfsaWebWorld()
-
-    data_version = 2
 
     options_dataclass = ZfsaOptions
     options: ZfsaOptions
@@ -100,7 +101,7 @@ def launch_client():
 
 
 def add_client_to_launcher() -> None:
-    version = "0.0.4"
+    version = WORLD_VERSION
     found = False
     for c in components:
         if c.display_name == "Zelda Four Swords Adventures Client":

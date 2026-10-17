@@ -1,6 +1,8 @@
 {
-	"compatible_version": 2,
-	"version": 2,
 	"game": "The Legend of Zelda: Four Swords Adventures",
-	"minimum_ap_version": "0.6.7"
+	"world_version": "0.0.7",
+	"authors": ["Drogings"],
+	"minimum_ap_version": "0.6.7",
+	"version": 7,
+	"compatible_version": 7
 }
