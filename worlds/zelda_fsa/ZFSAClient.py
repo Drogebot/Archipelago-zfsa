@@ -118,6 +118,9 @@ class ZfsaContext(CommonContext):
     deathlink_killed_player = False
     
     is_first_item_sync = True
+    known_items_loaded = False
+    save_known_items = False
+    known_items = {}
     received_hearts = 0
     received_fairies = 0
     remaining_fairies = 0
@@ -183,6 +186,7 @@ class ZfsaContext(CommonContext):
                 asyncio.create_task(self.update_death_link(True))
                 self.deathlink_enabled = temp
             
+            self.set_notify(get_known_items_storage_key(self))
             self.set_notify(get_fairy_storage_key_received(self))
             self.set_notify(get_fairy_storage_key_remaining(self))
             
@@ -203,6 +207,20 @@ async def game_watcher(ctx: ZfsaContext):
         await ctx.send_msgs(sync_msg)
         
         #data storage
+        known_items_key = get_known_items_storage_key(ctx)
+        if known_items_key in ctx.stored_data and not ctx.known_items_loaded:
+            ctx.known_items_loaded = True
+            known_items = ctx.stored_data[known_items_key]
+            #logger.info(known_items)
+            if known_items != None:
+                for item in known_items:
+                    ctx.known_items[int(item)] = known_items[item]
+                ctx.known_items = collections.Counter(ctx.known_items)
+            logger.info(f"Loaded {sum(ctx.known_items.values())} items from Data Storage")
+        if ctx.save_known_items:
+            ctx.save_known_items = False
+            await save_known_items(ctx)
+            
         fairy_key_received = get_fairy_storage_key_received(ctx)
         fairy_key_remaining = get_fairy_storage_key_remaining(ctx)
         if fairy_key_received in ctx.stored_data and fairy_key_remaining in ctx.stored_data and not ctx.fairy_storage_loaded:
@@ -326,10 +344,30 @@ def send_victory(ctx: ZfsaContext):
     return
 
 
+def get_known_items_storage_key(ctx: ZfsaContext):
+    return f"zfsa_known_items_{ctx.team}_{ctx.slot}"
 def get_fairy_storage_key_received(ctx: ZfsaContext):
     return f"zfsa_fairies_{ctx.team}_{ctx.slot}_received"
 def get_fairy_storage_key_remaining(ctx: ZfsaContext):
     return f"zfsa_fairies_{ctx.team}_{ctx.slot}_remaining"
+
+
+async def save_known_items(ctx: ZfsaContext):
+    if not ctx.known_items_loaded: return
+    await ctx.send_msgs([{
+        "cmd": "Set",
+        "key": get_known_items_storage_key(ctx),
+        "default": {},
+        "want_reply": False,
+        "operations": [
+            {
+                "operation": "update",
+                "value": ctx.known_items,
+            }
+        ],
+    }])
+    #logger.info(ctx.known_items)
+    #logger.info(f"Saved known items to Data Storage")
 
 
 async def save_fairy_count(ctx: ZfsaContext):
@@ -362,10 +400,25 @@ async def save_fairy_count(ctx: ZfsaContext):
 
 
 def refresh_all_items(ctx: ZfsaContext):
+    if not ctx.known_items_loaded:
+        return
+    
+    has_new_items = False
     counts = collections.Counter(received_item.item for received_item in ctx.items_received)
     gemtotal = 0
     for item in counts:
         amt = counts[item]
+        
+        if item not in ctx.known_items:
+            has_new_items = True
+            if ctx.is_first_item_sync:
+                continue
+        
+        if ctx.known_items[item] != amt:
+            has_new_items = True
+            if ctx.is_first_item_sync:
+                amt = ctx.known_items[item]
+        
         if amt > 0:
             unpack_item(item, ctx, amt)
             
@@ -378,6 +431,11 @@ def refresh_all_items(ctx: ZfsaContext):
     if gemtotal < 0: gemtotal = 0
     if gemtotal != ctx.gemtotal:
         activate_gems(gemtotal - ctx.gemtotal, ctx)
+    
+    if not ctx.is_first_item_sync:
+        ctx.known_items = counts
+        if has_new_items:
+            ctx.save_known_items = True
     
     if ctx.ap_connected and ctx.is_first_item_sync:
         ctx.is_first_item_sync = False
@@ -589,6 +647,8 @@ def activate_fire_trap(amt, ctx):
 
 
 def show_message(message, ctx):
+    if ctx.is_first_item_sync:
+        return
     ctx.queued_messages.append(message)
 
 # Checks to see if player changed stages to update map_id for Poptracker
@@ -611,6 +671,7 @@ async def send_map_id(map_id, screen_id, layer_id, ctx):
 class LocationInfo:
     location_id: int
     flagId: "LocationFlag"
+    type: DoorType
     checked: bool = False
 
 
@@ -633,11 +694,15 @@ DOORMAP: dict[int, list[DoorInfo]] = {}
 def create_location_memory_map():
     for region_name in ALL_REGIONS:
         region = ALL_REGIONS[region_name]
-        STAGEMAP[region.stageId] = LocationInfo(region.id, None)
+        STAGEMAP[region.stageId] = LocationInfo(region.id, None, DoorType.unknown)
         LOCMAP[region.stageId] = []
         for chest in region.chests:
-            loc = LocationInfo(chest.id, chest.flagId)
+            loc = LocationInfo(chest.id, chest.flagId, DoorType.big_chest)
             LOCMAP_BY_LOCATIONID[chest.id] = loc
+            LOCMAP[region.stageId].append(loc)
+        if region.jewel is not None:
+            loc = LocationInfo(region.jewel.id, region.jewel.flagId, DoorType.local_variable)
+            LOCMAP_BY_LOCATIONID[region.jewel.id] = loc
             LOCMAP[region.stageId].append(loc)
         DOORMAP[region.stageId] = []
         for door in region.doors:
@@ -655,28 +720,33 @@ async def handle_stage_select(ctx):
             game_state = dme.read_word(addresses.ZFSA_GAME_STATE)
             menu_adr = dme.read_word(addresses.ZFSA_MENU_PTR)
             
+            #skip intro
+            if game_state == 4:
+                dme.write_byte(addresses.ZFSA_SAVE_INTRO_SKIP, 3)
+            
             #stages beaten
-            stage_flags = dme.read_word(addresses.ZFSA_SAVE_STAGES)
-            for i in range(0, 32):
-                levelId = (i >> 2)+1
-                stageId = i & 0b11
-                if stageId == 2 and levelId != 8 or stageId == 1 and levelId == 8: continue
-                stageId = levelId*10 + stageId
-                beaten = (stage_flags & (1 << i)) > 0
-                loc = STAGEMAP[stageId]
-                if beaten and not loc.checked:
-                    if stageId == 83: send_victory(ctx)
-                    loc.checked = True
-                    ctx.locations_checked.add(loc.location_id)
-                    if not ctx.ticket_mode:
-                        ticket_id = (i >> 2)*2 + (1 if (i & 0b11) > 0 else 0)
-                        TICKETS[ticket_id].active = True
-                elif not beaten and loc.checked:
-                    stage_flags |= 1 << i
-                    dme.write_word(addresses.ZFSA_SAVE_STAGES, stage_flags)
-                    if not ctx.ticket_mode:
-                        ticket_id = (i >> 2)*2 + (1 if (i & 0b11) > 0 else 0)
-                        TICKETS[ticket_id].active = True
+            if game_state >= 4:
+                stage_flags = dme.read_word(addresses.ZFSA_SAVE_STAGES)
+                for i in range(0, 32):
+                    levelId = (i >> 2)+1
+                    stageId = i & 0b11
+                    if stageId == 2 and levelId != 8 or stageId == 1 and levelId == 8: continue
+                    stageId = levelId*10 + stageId
+                    beaten = (stage_flags & (1 << i)) > 0
+                    loc = STAGEMAP[stageId]
+                    if beaten and not loc.checked:
+                        if stageId == 83: send_victory(ctx)
+                        loc.checked = True
+                        ctx.locations_checked.add(loc.location_id)
+                        if not ctx.ticket_mode:
+                            ticket_id = (i >> 2)*2 + (1 if (i & 0b11) > 0 else 0)
+                            TICKETS[ticket_id].active = True
+                    elif not beaten and loc.checked:
+                        stage_flags |= 1 << i
+                        dme.write_word(addresses.ZFSA_SAVE_STAGES, stage_flags)
+                        if not ctx.ticket_mode:
+                            ticket_id = (i >> 2)*2 + (1 if (i & 0b11) > 0 else 0)
+                            TICKETS[ticket_id].active = True
             
             #fairy sync
             if game_state < 6:
@@ -702,7 +772,8 @@ async def handle_stage_select(ctx):
                         continue
                     stage_select_flags |= 1 << ticket.bit_position
                 dme.write_word(menu_adr + addresses.ZFSA_MENU_STAGE_SELECT_FLAGS_OFFSET, stage_select_flags)
-                if not was_in_menu:
+                mapstate = dme.read_word(menu_adr + addresses.ZFSA_MENU_MAPSTATE_OFFSET)
+                if not was_in_menu or mapstate == 21:
                     dme.write_word(menu_adr + addresses.ZFSA_MENU_MAPSTATE_OFFSET, 19)
                 was_in_menu = True
             
@@ -721,7 +792,7 @@ async def handle_stage(ctx):
                     prev_level = 0
                     prev_screen = -1
                     await send_map_id(0, 0, 0, ctx)
-                else:
+                elif game_state == 7:
                     stage_ptr_adr = dme.read_word(stage_ptr_ptr_adr + addresses.ZFSA_STAGE_PTR_OFFSET)
                     if stage_ptr_adr > 0:
                         stage_adr = dme.read_word(stage_ptr_adr + addresses.ZFSA_STAGE_OFFSET)
@@ -739,15 +810,25 @@ async def handle_stage(ctx):
                             
                             #locations
                             if cur_level <= 83:
-                                for chest in LOCMAP[cur_level]:
-                                    offset = chest.flagId.roomy*10*8*8 + chest.flagId.roomx*8*8 + chest.flagId.layer*8 + 4 - 4*(chest.flagId.index >> 5)
-                                    bit = chest.flagId.index & 0b11111
-                                    val = dme.read_word(stage_adr + addresses.ZFSA_STAGE_TILE_FLAGS_OFFSET + offset)
-                                    if chest.checked and (prev_level != cur_level or prev_screen != cur_screen):
-                                        dme.write_word(stage_adr + addresses.ZFSA_STAGE_TILE_FLAGS_OFFSET + offset, val | (1 << bit))
-                                    elif (val & (1 << bit)) > 0:
-                                        chest.checked = True
-                                        ctx.locations_checked.add(chest.location_id)
+                                for loc in LOCMAP[cur_level]:
+                                    if loc.type == DoorType.big_chest:
+                                        chest = loc
+                                        offset = chest.flagId.roomy*10*8*8 + chest.flagId.roomx*8*8 + chest.flagId.layer*8 + 4 - 4*(chest.flagId.index >> 5)
+                                        bit = chest.flagId.index & 0b11111
+                                        val = dme.read_word(stage_adr + addresses.ZFSA_STAGE_TILE_FLAGS_OFFSET + offset)
+                                        if chest.checked and (prev_level != cur_level or prev_screen != cur_screen):
+                                            dme.write_word(stage_adr + addresses.ZFSA_STAGE_TILE_FLAGS_OFFSET + offset, val | (1 << bit))
+                                        elif (val & (1 << bit)) > 0:
+                                            chest.checked = True
+                                            ctx.locations_checked.add(chest.location_id)
+                                    elif loc.type == DoorType.local_variable:
+                                        jewel = loc
+                                        offset = jewel.flagId.roomy*10*4 + jewel.flagId.roomx*4
+                                        bit = jewel.flagId.index & 0b11111
+                                        val = dme.read_word(stage_adr + addresses.ZFSA_STAGE_VARIABLES_OFFSET + offset)
+                                        if (val & (1 << bit)) > 0:
+                                            jewel.checked = True
+                                            ctx.locations_checked.add(jewel.location_id)
                                 
                                 #doors
                                 if ctx.reset_doors or prev_level != cur_level or prev_screen != cur_screen:
@@ -802,7 +883,7 @@ async def handle_link(ctx):
             try:
                 game_state = dme.read_word(addresses.ZFSA_GAME_STATE)
                 link_arr_adr = dme.read_word(addresses.ZFSA_LINK_ARR_PTR)
-                if game_state >= 7 and link_arr_adr > 0:
+                if game_state == 7 and link_arr_adr > 0:
                     link_adr = dme.read_word(link_arr_adr + addresses.ZFSA_LINK_ARR_OFFSET)
                     if link_adr > 0:
                         #link state legal
