@@ -14,7 +14,7 @@ from .options import ZfsaOptions
 from .regions import create_regions
 
 
-WORLD_VERSION = "0.0.7"
+WORLD_VERSION = "0.0.8"
 
 
 class ZfsaWebWorld(WebWorld):
@@ -47,6 +47,10 @@ class ZfsaWorld(World):
         create_regions(self)
 
     def create_items(self):
+        total_pool_size = len(ALL_LOCATIONS_TABLE)
+        if self.options.level_access == 0:
+            total_pool_size -= 8*2
+        
         pool = []
         for name in REGULAR_PROGRESSION_ITEMS.keys():
             item_id, item_amount = REGULAR_PROGRESSION_ITEMS[name]
@@ -62,11 +66,11 @@ class ZfsaWorld(World):
         for i in range(0, 32 - self.options.starting_health - 1):
             pool.append(self.create_item("Heart Piece"))
         
-        pool_spots_left = len(ALL_LOCATIONS_TABLE) - len(pool)
+        pool_spots_left = total_pool_size - len(pool)
         for i in range(0, int(pool_spots_left*.1)):
             pool.append(self.create_item(random.choice(list(TRAP_ITEMS))))
 
-        while len(pool) < len(ALL_LOCATIONS_TABLE):
+        while len(pool) < total_pool_size:
             pool.append(self.create_item(random.choice(list(JUNK_ITEMS))))
 
         self.multiworld.itempool += pool

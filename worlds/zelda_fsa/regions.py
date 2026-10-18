@@ -4,7 +4,7 @@ from BaseClasses import CollectionState, Region, ItemClassification
 from rule_builder.rules import And, Or, Has, CanReachRegion, True_
 from .items import ZfsaItem, TICKET_ITEMS
 from .locations import ZfsaLocation
-from .static_logic import ALL_REGIONS, ZfsaRegion, Key, Chest, Requirements, ItemType
+from .static_logic import ALL_REGIONS, ZfsaRegion, Key, Chest, Jewel, Requirements, ItemType
 
 if TYPE_CHECKING:
     from . import ZfsaWorld
@@ -188,6 +188,10 @@ def zfsa_chest_rule(chest: Chest, world: "ZfsaWorld"):
     return zfsa_requirements_rule(chest.requirements, world)
 
 
+def zfsa_jewel_rule(jewel: Jewel, world: "ZfsaWorld"):
+    return zfsa_requirements_rule(jewel.requirements, world)
+
+
 def zfsa_entrance_rule(region: ZfsaRegion, parent, ticket, world: "ZfsaWorld"):
     rules = []
 
@@ -197,7 +201,10 @@ def zfsa_entrance_rule(region: ZfsaRegion, parent, ticket, world: "ZfsaWorld"):
             Has("Green Royal Jewel"),
             Has("Red Royal Jewel"),
             Has("Purple Royal Jewel"),
+            Has("Progressive Maiden", 6),
         ))
+    if region.requirements.zelda:
+        rules.append(Has("Progressive Maiden", 7))
 
     if world.options.level_access == 1:
         if ticket is not None:
@@ -219,6 +226,10 @@ def create_region(region: ZfsaRegion, world: "ZfsaWorld"):
     for chest in region.chests:
         new_location = ZfsaLocation(world.player, f"{region.name} - {chest.name}", chest.id, new_region)
         world.set_rule(new_location, zfsa_chest_rule(chest, world))
+        new_region.locations.append(new_location)
+    if region.jewel is not None:
+        new_location = ZfsaLocation(world.player, f"{region.name} - {region.jewel.name}", region.jewel.id, new_region)
+        world.set_rule(new_location, zfsa_jewel_rule(region.jewel, world))
         new_region.locations.append(new_location)
     
     location_name = f"{region.name} - Stage Clear"

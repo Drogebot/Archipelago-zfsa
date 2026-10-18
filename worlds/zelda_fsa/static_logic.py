@@ -91,6 +91,16 @@ class Key(NamedTuple):
     tears: Requirements = Requirements()
 
 
+class Jewel(NamedTuple):
+    name: str
+    id: int
+    flagId: LocationFlag
+    requirements: Requirements = Requirements()
+    hard: Requirements = Requirements()
+    advanced: Requirements = Requirements()
+    tears: Requirements = Requirements()
+
+
 class DoorType(Flag):
     door = auto(),
     big_chest = auto(),
@@ -114,6 +124,7 @@ class ZfsaRegion(NamedTuple):
     keys: list[Key] = []
     chests: list[Chest] = []
     doors: list[Door] = []
+    jewel: Jewel = None
     parentRegion: Optional[str] = None
 
 BASE_LOCATION_OFFSET = 379000
@@ -326,7 +337,8 @@ ALL_REGIONS: dict[str, ZfsaRegion] = {
     ], [
         Door("The Field Storeroom Key", 1, DoorType.door, LocationFlag(7,3,0,0)),
         Door("The Field Stange Cave Key", 1, DoorType.door, LocationFlag(6,0,5,0)),
-    ]),
+    ], jewel=Jewel("Blue Royal Jewel", BASE_LOCATION_OFFSET+493, LocationFlag(8,0,0,18), Requirements([[ItemType.shovel]])),
+    ),
     
     "The Swamp": ZfsaRegion("The Swamp", 41, BASE_LOCATION_OFFSET+148, Requirements([[ItemType.rocs_feather]], power_bracelet=True), [
         Key("Graveyard East Key", BASE_LOCATION_OFFSET+149, LocationFlag(1,5,6,62), Requirements([[ItemType.rocs_feather, ItemType.bow]], keys=[KeyType("The Swamp Progressive Graveyard East Key")])),
@@ -437,7 +449,8 @@ ALL_REGIONS: dict[str, ZfsaRegion] = {
         Chest("Lake Chest", BASE_LOCATION_OFFSET+228, LocationFlag(0,1,0,0), Requirements([[ItemType.pegasus_boots | ItemType.bombs, ItemType.shovel, ItemType.lamp | ItemType.fire_rod]], power_bracelet=True)),
     ], [
         Door("Kakariko Village South East House Key", 1, DoorType.door, LocationFlag(1,3,2,3)),
-    ], parentRegion="Lost Woods"),
+    ], jewel=Jewel("Green Royal Jewel", BASE_LOCATION_OFFSET+494, LocationFlag(6,8,0,18), Requirements([[ItemType.pegasus_boots | ItemType.bombs, ItemType.shovel, ItemType.lamp | ItemType.fire_rod]], power_bracelet=True)),
+    parentRegion="Lost Woods"),
     
     "Temple of Darkness": ZfsaRegion("Temple of Darkness", 53, BASE_LOCATION_OFFSET+229, Requirements([[ItemType.magic_hammer, ItemType.lamp | ItemType.fire_rod]], keys=[KeyType("Temple of Darkness Progressive Key", 5)]), [
         Key("1F Stairs Key", BASE_LOCATION_OFFSET+230, LocationFlag(2,4,5,30), Requirements()),
@@ -519,7 +532,8 @@ ALL_REGIONS: dict[str, ZfsaRegion] = {
         Chest("Desert Crater Bomb Cave Chest 2", BASE_LOCATION_OFFSET+295, LocationFlag(0,3,7,3), Requirements([[ItemType.pegasus_bootsL2]], keys=[KeyType("Desert of Doubt Gerudo Town North East Moon Gate")])),
     ], [
         Door("Desert of Doubt Gerudo Town North East Moon Gate", 1, DoorType.moon_gate, LocationFlag(2,4,0,22)),
-    ]),
+    ], jewel=Jewel("Red Royal Jewel", BASE_LOCATION_OFFSET+495, LocationFlag(0,1,0,18), Requirements([[ItemType.pegasus_bootsL2]], keys=[KeyType("Desert of Doubt Gerudo Town North East Moon Gate")])),
+    ),
     
     "Desert Temple": ZfsaRegion("Desert Temple", 61, BASE_LOCATION_OFFSET+296, Requirements([[ItemType.bow]], keys=[KeyType("Desert Temple Progressive Key", 3)]), [
         Key("Right Wing Key", BASE_LOCATION_OFFSET+297, LocationFlag(4,6,0,11), Requirements([[ItemType.magic_hammer]])),#This is a Hammer Bulge
@@ -601,7 +615,8 @@ ALL_REGIONS: dict[str, ZfsaRegion] = {
     ], [
         Door("Frozen Hyrule House Key", 1, DoorType.door, LocationFlag(3,6,0,0)),
         Door("Frozen Hyrule House West Moon Gate", 1, DoorType.moon_gate, LocationFlag(2,6,0,21)),
-    ]),
+    ], jewel=Jewel("Purple Royal Jewel", BASE_LOCATION_OFFSET+496, LocationFlag(2,1,0,18), Requirements([[ItemType.fire_rod]], keys=[KeyType("Frozen Hyrule House West Moon Gate")])),
+    ),
     
     "The Ice Temple": ZfsaRegion("The Ice Temple", 71, BASE_LOCATION_OFFSET+353, Requirements([[ItemType.fire_rodL2]], keys=[KeyType("The Ice Temple Progressive Key", 4)], jewels=True), [], [
         Chest("Entrance Chest", BASE_LOCATION_OFFSET+354, LocationFlag(5,9,0,1), Requirements()),
