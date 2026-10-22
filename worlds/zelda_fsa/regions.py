@@ -171,6 +171,40 @@ def zfsa_requirements_rule(requirements: Requirements, world: "ZfsaWorld"):
                 Has("Progressive Bombs"),
             ))
 
+        if requirements.desert_cactus:
+            trick_rules.append(Or(
+                Has("Progressive Pegasus Boots"),
+                Has("Progressive Roc's Feather"),
+            ))
+
+        if requirements.desert_death_clip:
+            trick_rules.append(Or(
+                Has("Progressive Pegasus Boots", count=2),
+                Has("Progressive Roc's Feather", count=2),
+            ))
+
+        if requirements.gap_regroup:
+            trick_rules.append(Or(
+                Has("Progressive Roc's Feather"),
+                Has("Progressive Pegasus Boots", count=2),
+            ))
+
+        if requirements.gap_big_regroup:
+            trick_rules.append(Or(
+                Has("Progressive Pegasus Boots", count=2),
+                Has("Progressive Roc's Feather", count=2),
+            ))
+
+        if requirements.gap_bigest_regroup:
+            trick_rules.append(Has("Progressive Pegasus Boots", count=2))
+
+        if requirements.gap_big_bow_regroup:
+            trick_rules.append(Or(
+                Has("Progressive Bow"),
+                Has("Progressive Pegasus Boots", count=2),
+                Has("Progressive Roc's Feather", count=2),
+            ))
+
         if trick_rules:
             rules.append(Or(
                 And(*trick_rules),

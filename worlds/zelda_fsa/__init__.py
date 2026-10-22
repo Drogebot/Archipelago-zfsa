@@ -14,7 +14,7 @@ from .options import ZfsaOptions
 from .regions import create_regions
 
 
-WORLD_VERSION = "0.0.8"
+WORLD_VERSION = "0.0.9"
 
 
 class ZfsaWebWorld(WebWorld):
@@ -41,7 +41,7 @@ class ZfsaWorld(World):
     glitches_item_name = "Universal Tracker Glitched Logic"
 
     def generate_early(self):
-        temp = False
+        self.options.start_inventory.value["Heart Piece"] = self.options.starting_health
 
     def create_regions(self):
         create_regions(self)

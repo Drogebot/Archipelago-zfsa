@@ -12,6 +12,7 @@
 2. Download and install the latest release of Dolphin Emulator from the link above.
 
 3. Download the latest release of FSAAPPatcher from the link above. This will be used to patch your iso file.
+   - You might have to install the latest [.NET 10 Runtime](https://dotnet.microsoft.com/en-us/download/dotnet/10.0) if you haven't already.
 
 4. Download the APWorld from the [releases](https://github.com/Drogebot/archipelago-zfsa/releases/latest) page and place it in your `custom_worlds` folder located in your Archipelago install directory.
 
@@ -46,7 +47,6 @@ every game in your `custom_worlds` folder. You can manually edit the config file
 8. In the server page, there will be a port number. Copy this port number into the top of your ZFSAClient. 
    - The field should read `archipelago.gg:<port number>`
 9. Once you have loaded into the game, click the `Connect` button at the top of the ZFSAClient. Once it says you are connected you're free to play, choose a brand new file and start playing!
-10. You are required to play singleplayer with the GameCube controller.
 
 ## Joining a MultiWorld Game
 
@@ -61,6 +61,7 @@ the host will provide you with a link to the room or the address and port necess
 
 ### Play the game
 
-**Before you start:** It is important that you start from a blank save file in slot 1. Pease backup your save or delete it from Memory Card A `01-G4SE-gc4sword.gci`.
+**Before you start:** It is important that you start from a blank save file on Quest Log 1. Pease backup your save or delete it from Memory Card A `01-G4SE-gc4sword.gci`.
+You must play in Single-Player mode and use a GameCube controller.
 It is also recomended to disable savestates to prevent you from accidentally sending checks.
 Remember to be in the File Select screen **BEFORE** connecting in case of starting any new playthroughs as it might send unwanted checks if you connect while in a different save file

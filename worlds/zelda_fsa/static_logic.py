@@ -62,6 +62,12 @@ class Requirements(NamedTuple):
     bowless_gohma: bool = False #skips needing bow
     jump_pound: bool = False #skips needing feather or bombs
     jump_pound_side: bool = False #skips needing boots, feather or bombs
+    desert_cactus: bool = False #skips needing boots or feather
+    desert_death_clip: bool = False #skips needing bootsL2 or featherL2
+    gap_regroup: bool = False #skips needing feather or bootsL2
+    gap_big_regroup: bool = False #skips needing bootsL2 or featherL2
+    gap_bigest_regroup: bool = False #skips needing bootsL2
+    gap_big_bow_regroup: bool = False #skips needing bow, bootsL2 or featherL2
 
 
 class LocationFlag(NamedTuple):
@@ -264,17 +270,17 @@ ALL_REGIONS: dict[str, ZfsaRegion] = {
     ], parentRegion="Village of the Blue Maiden"),
     
     
-    "Death Mountain Foothills": ZfsaRegion("Death Mountain Foothills", 30, BASE_LOCATION_OFFSET+92, Requirements([[ItemType.bow | ItemType.pegasus_bootsL2 | ItemType.rocs_featherL2, ItemType.magic_hammer]]), [], [
+    "Death Mountain Foothills": ZfsaRegion("Death Mountain Foothills", 30, BASE_LOCATION_OFFSET+92, Requirements([[ItemType.magic_hammer]], gap_big_bow_regroup=True), [], [
         Chest("Start Chest", BASE_LOCATION_OFFSET+93, LocationFlag(0,8,5,2), Requirements()),
-        Chest("Past Bridge Chest 1", BASE_LOCATION_OFFSET+94, LocationFlag(0,5,5,42), Requirements([[ItemType.bow | ItemType.pegasus_bootsL2 | ItemType.rocs_featherL2]])),
-        Chest("Past Bridge Chest 2", BASE_LOCATION_OFFSET+95, LocationFlag(0,5,5,43), Requirements([[ItemType.bow | ItemType.pegasus_bootsL2 | ItemType.rocs_featherL2]])),
-        Chest("Mountain Side Chest 1", BASE_LOCATION_OFFSET+96, LocationFlag(0,4,5,0), Requirements([[ItemType.bow | ItemType.pegasus_bootsL2 | ItemType.rocs_featherL2]])),
-        Chest("Mountain Side Chest 2", BASE_LOCATION_OFFSET+97, LocationFlag(0,4,5,1), Requirements([[ItemType.bow | ItemType.pegasus_bootsL2 | ItemType.rocs_featherL2]])),
-        Chest("Maze Chest", BASE_LOCATION_OFFSET+98, LocationFlag(1,4,5,2), Requirements([[ItemType.bow | ItemType.pegasus_bootsL2 | ItemType.rocs_featherL2, ItemType.magic_hammer]])),
-        Chest("Mountain Side Bomb Chest", BASE_LOCATION_OFFSET+99, LocationFlag(1,3,5,0), Requirements([[ItemType.bow | ItemType.pegasus_bootsL2 | ItemType.rocs_featherL2, ItemType.magic_hammer, ItemType.lamp | ItemType.boomerang | ItemType.bow | ItemType.fire_rod | ItemType.bombs | ItemType.slingshot | ItemType.pegasus_bootsL2 | ItemType.magic_hammerL2]])),
-        Chest("Mountain Path Lower Chest", BASE_LOCATION_OFFSET+100, LocationFlag(2,3,5,1), Requirements([[ItemType.bow | ItemType.pegasus_bootsL2 | ItemType.rocs_featherL2, ItemType.magic_hammer, ItemType.boomerang | ItemType.rocs_feather | ItemType.pegasus_bootsL2 | ItemType.bombsL2 | ItemType.slingshotL2]])),
-        Chest("Hebra's Hill Chest 1", BASE_LOCATION_OFFSET+101, LocationFlag(2,1,5,0), Requirements([[ItemType.bow | ItemType.pegasus_bootsL2 | ItemType.rocs_featherL2, ItemType.magic_hammer]])),
-        Chest("Hebra's Hill Chest 2", BASE_LOCATION_OFFSET+102, LocationFlag(2,1,5,1), Requirements([[ItemType.bow | ItemType.pegasus_bootsL2 | ItemType.rocs_featherL2, ItemType.magic_hammer]])),
+        Chest("Past Bridge Chest 1", BASE_LOCATION_OFFSET+94, LocationFlag(0,5,5,42), Requirements([], gap_big_bow_regroup=True)),
+        Chest("Past Bridge Chest 2", BASE_LOCATION_OFFSET+95, LocationFlag(0,5,5,43), Requirements([], gap_big_bow_regroup=True)),
+        Chest("Mountain Side Chest 1", BASE_LOCATION_OFFSET+96, LocationFlag(0,4,5,0), Requirements([], gap_big_bow_regroup=True)),
+        Chest("Mountain Side Chest 2", BASE_LOCATION_OFFSET+97, LocationFlag(0,4,5,1), Requirements([], gap_big_bow_regroup=True)),
+        Chest("Maze Chest", BASE_LOCATION_OFFSET+98, LocationFlag(1,4,5,2), Requirements([[ItemType.magic_hammer]], gap_big_bow_regroup=True)),
+        Chest("Mountain Side Bomb Chest", BASE_LOCATION_OFFSET+99, LocationFlag(1,3,5,0), Requirements([[ItemType.magic_hammer, ItemType.lamp | ItemType.boomerang | ItemType.bow | ItemType.fire_rod | ItemType.bombs | ItemType.slingshot | ItemType.pegasus_bootsL2 | ItemType.magic_hammerL2]], gap_big_bow_regroup=True)),
+        Chest("Mountain Path Lower Chest", BASE_LOCATION_OFFSET+100, LocationFlag(2,3,5,1), Requirements([[ItemType.magic_hammer, ItemType.boomerang | ItemType.rocs_feather | ItemType.pegasus_bootsL2 | ItemType.bombsL2 | ItemType.slingshotL2]], gap_big_bow_regroup=True)),
+        Chest("Hebra's Hill Chest 1", BASE_LOCATION_OFFSET+101, LocationFlag(2,1,5,0), Requirements([[ItemType.magic_hammer]], gap_big_bow_regroup=True)),
+        Chest("Hebra's Hill Chest 2", BASE_LOCATION_OFFSET+102, LocationFlag(2,1,5,1), Requirements([[ItemType.magic_hammer]], gap_big_bow_regroup=True)),
     ], []),
     
     "The Mountain Path": ZfsaRegion("The Mountain Path", 31, BASE_LOCATION_OFFSET+103, Requirements([], helmaroc_regroup=True), [
@@ -288,20 +294,20 @@ ALL_REGIONS: dict[str, ZfsaRegion] = {
         Door("The Mountain Path Water Storage Key", 1, DoorType.door, LocationFlag(3,4,7,0)),
     ], parentRegion="Death Mountain Foothills"),
     
-    "Tower of Flames": ZfsaRegion("Tower of Flames", 33, BASE_LOCATION_OFFSET+109, Requirements([[ItemType.bow | ItemType.slingshot | ItemType.pegasus_bootsL2 | ItemType.boomerangL2 | ItemType.bombsL2, ItemType.rocs_feather | ItemType.pegasus_bootsL2, ItemType.bombs]], keys=[KeyType("Tower of Flames 4F Key")]), [], [
+    "Tower of Flames": ZfsaRegion("Tower of Flames", 33, BASE_LOCATION_OFFSET+109, Requirements([[ItemType.bow | ItemType.slingshot | ItemType.pegasus_bootsL2 | ItemType.boomerangL2 | ItemType.bombsL2, ItemType.bombs]], keys=[KeyType("Tower of Flames 4F Key")], gap_regroup=True), [], [
         #Chest("2F Chest 1", BASE_LOCATION_OFFSET+110, LocationFlag(1,7,0,0), Requirements([[ItemType.bow | ItemType.slingshot | ItemType.pegasus_bootsL2 | ItemType.boomerangL2 | ItemType.bombsL2]])),# didn't spawn???
         Chest("2F Chest", BASE_LOCATION_OFFSET+111, LocationFlag(1,7,0,1), Requirements([[ItemType.bow | ItemType.slingshot | ItemType.pegasus_bootsL2 | ItemType.boomerangL2 | ItemType.bombsL2]])),
         #Chest("2F Chest 3", BASE_LOCATION_OFFSET+112, LocationFlag(1,7,0,2), Requirements([[ItemType.bow | ItemType.slingshot | ItemType.pegasus_bootsL2 | ItemType.boomerangL2 | ItemType.bombsL2]])),# didn't spawn???
-        Chest("3F Chest 1", BASE_LOCATION_OFFSET+113, LocationFlag(1,6,0,0), Requirements([[ItemType.bow | ItemType.slingshot | ItemType.pegasus_bootsL2 | ItemType.boomerangL2 | ItemType.bombsL2, ItemType.rocs_feather | ItemType.pegasus_bootsL2]])),
-        Chest("3F Chest 2", BASE_LOCATION_OFFSET+114, LocationFlag(1,6,0,1), Requirements([[ItemType.bow | ItemType.slingshot | ItemType.pegasus_bootsL2 | ItemType.boomerangL2 | ItemType.bombsL2, ItemType.rocs_feather | ItemType.pegasus_bootsL2]])),
-        Chest("4F Chest 1", BASE_LOCATION_OFFSET+115, LocationFlag(1,5,6,2), Requirements([[ItemType.bow | ItemType.slingshot | ItemType.pegasus_bootsL2 | ItemType.boomerangL2 | ItemType.bombsL2, ItemType.rocs_feather | ItemType.pegasus_bootsL2]])),
-        Chest("4F Chest 2", BASE_LOCATION_OFFSET+116, LocationFlag(1,5,5,0), Requirements([[ItemType.bow | ItemType.slingshot | ItemType.pegasus_bootsL2 | ItemType.boomerangL2 | ItemType.bombsL2, ItemType.rocs_feather | ItemType.pegasus_bootsL2]])),
-        Chest("4F Chest 3", BASE_LOCATION_OFFSET+117, LocationFlag(1,5,5,3), Requirements([[ItemType.bow | ItemType.slingshot | ItemType.pegasus_bootsL2 | ItemType.boomerangL2 | ItemType.bombsL2, ItemType.rocs_feather | ItemType.pegasus_bootsL2]])),
-        Chest("6F Chest 1", BASE_LOCATION_OFFSET+118, LocationFlag(1,3,0,1), Requirements([[ItemType.bow | ItemType.slingshot | ItemType.pegasus_bootsL2 | ItemType.boomerangL2 | ItemType.bombsL2, ItemType.rocs_feather | ItemType.pegasus_bootsL2]], keys=[KeyType("Tower of Flames 4F Key")])),
-        Chest("6F Chest 2", BASE_LOCATION_OFFSET+119, LocationFlag(1,3,0,2), Requirements([[ItemType.bow | ItemType.slingshot | ItemType.pegasus_bootsL2 | ItemType.boomerangL2 | ItemType.bombsL2, ItemType.rocs_feather | ItemType.pegasus_bootsL2]], keys=[KeyType("Tower of Flames 4F Key")])),
-        Chest("6F Chest 3", BASE_LOCATION_OFFSET+120, LocationFlag(1,3,6,0), Requirements([[ItemType.bow | ItemType.slingshot | ItemType.pegasus_bootsL2 | ItemType.boomerangL2 | ItemType.bombsL2, ItemType.rocs_feather | ItemType.pegasus_bootsL2, ItemType.bombs]], keys=[KeyType("Tower of Flames 4F Key")])),
-        Chest("7F Chest 1", BASE_LOCATION_OFFSET+121, LocationFlag(0,2,0,0), Requirements([[ItemType.bow | ItemType.slingshot | ItemType.pegasus_bootsL2 | ItemType.boomerangL2 | ItemType.bombsL2, ItemType.rocs_feather | ItemType.pegasus_bootsL2]], keys=[KeyType("Tower of Flames 4F Key")])),
-        Chest("7F Chest 2", BASE_LOCATION_OFFSET+122, LocationFlag(0,2,0,1), Requirements([[ItemType.bow | ItemType.slingshot | ItemType.pegasus_bootsL2 | ItemType.boomerangL2 | ItemType.bombsL2, ItemType.rocs_feather | ItemType.pegasus_bootsL2]], keys=[KeyType("Tower of Flames 4F Key")])),
+        Chest("3F Chest 1", BASE_LOCATION_OFFSET+113, LocationFlag(1,6,0,0), Requirements([[ItemType.bow | ItemType.slingshot | ItemType.pegasus_bootsL2 | ItemType.boomerangL2 | ItemType.bombsL2]], gap_regroup=True)),
+        Chest("3F Chest 2", BASE_LOCATION_OFFSET+114, LocationFlag(1,6,0,1), Requirements([[ItemType.bow | ItemType.slingshot | ItemType.pegasus_bootsL2 | ItemType.boomerangL2 | ItemType.bombsL2]], gap_regroup=True)),
+        Chest("4F Chest 1", BASE_LOCATION_OFFSET+115, LocationFlag(1,5,6,2), Requirements([[ItemType.bow | ItemType.slingshot | ItemType.pegasus_bootsL2 | ItemType.boomerangL2 | ItemType.bombsL2]], gap_regroup=True)),
+        Chest("4F Chest 2", BASE_LOCATION_OFFSET+116, LocationFlag(1,5,5,0), Requirements([[ItemType.bow | ItemType.slingshot | ItemType.pegasus_bootsL2 | ItemType.boomerangL2 | ItemType.bombsL2]], gap_regroup=True)),
+        Chest("4F Chest 3", BASE_LOCATION_OFFSET+117, LocationFlag(1,5,5,3), Requirements([[ItemType.bow | ItemType.slingshot | ItemType.pegasus_bootsL2 | ItemType.boomerangL2 | ItemType.bombsL2]], gap_regroup=True)),
+        Chest("6F Chest 1", BASE_LOCATION_OFFSET+118, LocationFlag(1,3,0,1), Requirements([[ItemType.bow | ItemType.slingshot | ItemType.pegasus_bootsL2 | ItemType.boomerangL2 | ItemType.bombsL2]], keys=[KeyType("Tower of Flames 4F Key")], gap_regroup=True)),
+        Chest("6F Chest 2", BASE_LOCATION_OFFSET+119, LocationFlag(1,3,0,2), Requirements([[ItemType.bow | ItemType.slingshot | ItemType.pegasus_bootsL2 | ItemType.boomerangL2 | ItemType.bombsL2]], keys=[KeyType("Tower of Flames 4F Key")], gap_regroup=True)),
+        Chest("6F Chest 3", BASE_LOCATION_OFFSET+120, LocationFlag(1,3,6,0), Requirements([[ItemType.bow | ItemType.slingshot | ItemType.pegasus_bootsL2 | ItemType.boomerangL2 | ItemType.bombsL2, ItemType.bombs]], keys=[KeyType("Tower of Flames 4F Key")], gap_regroup=True)),
+        Chest("7F Chest 1", BASE_LOCATION_OFFSET+121, LocationFlag(0,2,0,0), Requirements([[ItemType.bow | ItemType.slingshot | ItemType.pegasus_bootsL2 | ItemType.boomerangL2 | ItemType.bombsL2]], keys=[KeyType("Tower of Flames 4F Key")], gap_regroup=True)),
+        Chest("7F Chest 2", BASE_LOCATION_OFFSET+122, LocationFlag(0,2,0,1), Requirements([[ItemType.bow | ItemType.slingshot | ItemType.pegasus_bootsL2 | ItemType.boomerangL2 | ItemType.bombsL2]], keys=[KeyType("Tower of Flames 4F Key")], gap_regroup=True)),
     ], [
         Door("Tower of Flames 4F Key", 1, DoorType.door, LocationFlag(1,5,0,0)),
     ], parentRegion="The Mountain Path"),
@@ -385,7 +391,7 @@ ALL_REGIONS: dict[str, ZfsaRegion] = {
         #Chest("Fire Void Room Chest 1", BASE_LOCATION_OFFSET+182, LocationFlag(2,3,7,0), Requirements([], keys=[KeyType("Infiltration of Hyrule Castle Progressive Basement Key", 2)])),# not accessable?
         #Chest("Fire Void Room Chest 2", BASE_LOCATION_OFFSET+183, LocationFlag(2,3,7,1), Requirements([], keys=[KeyType("Infiltration of Hyrule Castle Progressive Basement Key", 2)])),# not accessable?
     ], [
-        Door("Infiltration of Hyrule Castle Lower Jail Key", 1, DoorType.door, LocationFlag(4,6,0,0)),
+        Door("Infiltration of Hyrule Castle Outside Jail Key", 1, DoorType.door, LocationFlag(4,6,0,0)),
         Door("Infiltration of Hyrule Castle Basement Stairs Moon Gate", 1, DoorType.moon_gate, LocationFlag(0,3,0,36)),
         Door("Infiltration of Hyrule Castle Progressive Basement Key", 1, DoorType.door, LocationFlag(0,3,0,2)),
         Door("Infiltration of Hyrule Castle Progressive Basement Key", 2, DoorType.door, LocationFlag(1,3,0,6)),
@@ -496,7 +502,7 @@ ALL_REGIONS: dict[str, ZfsaRegion] = {
     ], parentRegion="Kakariko Village"),
     
     
-    "Desert of Doubt": ZfsaRegion("Desert of Doubt", 60, BASE_LOCATION_OFFSET+262, Requirements([[ItemType.pegasus_bootsL2]], keys=[KeyType("Desert of Doubt Gerudo Town North East Moon Gate")]), [], [
+    "Desert of Doubt": ZfsaRegion("Desert of Doubt", 60, BASE_LOCATION_OFFSET+262, Requirements([[ItemType.rocs_feather | ItemType.pegasus_bootsL2]], keys=[KeyType("Desert of Doubt Gerudo Town North East Moon Gate")], gap_bigest_regroup=True, desert_death_clip=True), [], [
         #Chest("Start Chest 1", BASE_LOCATION_OFFSET+263, LocationFlag(1,6,3,1), Requirements()),# not accessable?
         #Chest("Start Chest 2", BASE_LOCATION_OFFSET+264, LocationFlag(1,6,3,2), Requirements()),# not accessable?
         #Chest("Start Chest 3", BASE_LOCATION_OFFSET+265, LocationFlag(1,6,3,3), Requirements()),# not accessable?
@@ -516,23 +522,23 @@ ALL_REGIONS: dict[str, ZfsaRegion] = {
         Chest("Zuna Village South West Cave Chest 3", BASE_LOCATION_OFFSET+279, LocationFlag(2,3,6,18), Requirements([[ItemType.pegasus_boots | ItemType.bombs]], keys=[KeyType("Desert of Doubt Gerudo Town North East Moon Gate")])),
         Chest("Zuna Village South West Cave Chest 4", BASE_LOCATION_OFFSET+280, LocationFlag(2,3,7,1), Requirements([[ItemType.pegasus_boots | ItemType.bombs]], keys=[KeyType("Desert of Doubt Gerudo Town North East Moon Gate")])),
         Chest("Zuna Village South West Cave Chest 5", BASE_LOCATION_OFFSET+281, LocationFlag(2,3,7,2), Requirements([[ItemType.pegasus_boots | ItemType.bombs]], keys=[KeyType("Desert of Doubt Gerudo Town North East Moon Gate")])),
-        Chest("Zuna Village South Chest", BASE_LOCATION_OFFSET+282, LocationFlag(3,3,5,0), Requirements([[ItemType.rocs_feather | ItemType.pegasus_bootsL2]], keys=[KeyType("Desert of Doubt Gerudo Town North East Moon Gate")])),
-        Chest("Zuna Village Bottom Right House Chest 1", BASE_LOCATION_OFFSET+283, LocationFlag(3,2,2,0), Requirements([[ItemType.pegasus_boots | ItemType.rocs_feather]], keys=[KeyType("Desert of Doubt Gerudo Town North East Moon Gate")])),
-        Chest("Zuna Village Bottom Right House Chest 2", BASE_LOCATION_OFFSET+284, LocationFlag(3,2,2,1), Requirements([[ItemType.pegasus_boots | ItemType.rocs_feather]], keys=[KeyType("Desert of Doubt Gerudo Town North East Moon Gate")])),
-        Chest("Zuna Village Top House Chest 1", BASE_LOCATION_OFFSET+285, LocationFlag(3,2,3,7), Requirements([[ItemType.pegasus_boots | ItemType.rocs_feather]], keys=[KeyType("Desert of Doubt Gerudo Town North East Moon Gate")])),
-        Chest("Zuna Village Top House Chest 2", BASE_LOCATION_OFFSET+286, LocationFlag(3,2,3,8), Requirements([[ItemType.pegasus_boots | ItemType.rocs_feather]], keys=[KeyType("Desert of Doubt Gerudo Town North East Moon Gate")])),
+        Chest("Zuna Village South Chest", BASE_LOCATION_OFFSET+282, LocationFlag(3,3,5,0), Requirements([], keys=[KeyType("Desert of Doubt Gerudo Town North East Moon Gate")], desert_cactus=True, gap_regroup=True)),
+        Chest("Zuna Village Bottom Right House Chest 1", BASE_LOCATION_OFFSET+283, LocationFlag(3,2,2,0), Requirements([], keys=[KeyType("Desert of Doubt Gerudo Town North East Moon Gate")], desert_cactus=True)),
+        Chest("Zuna Village Bottom Right House Chest 2", BASE_LOCATION_OFFSET+284, LocationFlag(3,2,2,1), Requirements([], keys=[KeyType("Desert of Doubt Gerudo Town North East Moon Gate")], desert_cactus=True)),
+        Chest("Zuna Village Top House Chest 1", BASE_LOCATION_OFFSET+285, LocationFlag(3,2,3,7), Requirements([], keys=[KeyType("Desert of Doubt Gerudo Town North East Moon Gate")], desert_cactus=True)),
+        Chest("Zuna Village Top House Chest 2", BASE_LOCATION_OFFSET+286, LocationFlag(3,2,3,8), Requirements([], keys=[KeyType("Desert of Doubt Gerudo Town North East Moon Gate")], desert_cactus=True)),
         Chest("Desert Trap Chest 1", BASE_LOCATION_OFFSET+287, LocationFlag(1,3,0,0), Requirements([[ItemType.pegasus_bootsL2]], keys=[KeyType("Desert of Doubt Gerudo Town North East Moon Gate")])),
-        Chest("Desert Trap Chest 2", BASE_LOCATION_OFFSET+288, LocationFlag(1,3,0,1), Requirements([[ItemType.pegasus_bootsL2]], keys=[KeyType("Desert of Doubt Gerudo Town North East Moon Gate")])),
-        Chest("Desert Trap Chest 3", BASE_LOCATION_OFFSET+289, LocationFlag(1,3,0,2), Requirements([[ItemType.pegasus_bootsL2]], keys=[KeyType("Desert of Doubt Gerudo Town North East Moon Gate")])),
-        Chest("Desert Trap Cave Chest", BASE_LOCATION_OFFSET+290, LocationFlag(1,3,5,0), Requirements([[ItemType.pegasus_bootsL2]], keys=[KeyType("Desert of Doubt Gerudo Town North East Moon Gate")])),
-        Chest("Desert Crater Sand Chest", BASE_LOCATION_OFFSET+291, LocationFlag(0,3,5,0), Requirements([[ItemType.pegasus_bootsL2]], keys=[KeyType("Desert of Doubt Gerudo Town North East Moon Gate")])),
-        Chest("Desert Crater Hole Chest 1", BASE_LOCATION_OFFSET+292, LocationFlag(0,3,6,0), Requirements([[ItemType.pegasus_bootsL2]], keys=[KeyType("Desert of Doubt Gerudo Town North East Moon Gate")])),
-        Chest("Desert Crater Hole Chest 2", BASE_LOCATION_OFFSET+293, LocationFlag(0,3,7,0), Requirements([[ItemType.pegasus_bootsL2]], keys=[KeyType("Desert of Doubt Gerudo Town North East Moon Gate")])),
-        Chest("Desert Crater Bomb Cave Chest 1", BASE_LOCATION_OFFSET+294, LocationFlag(0,3,7,2), Requirements([[ItemType.pegasus_bootsL2]], keys=[KeyType("Desert of Doubt Gerudo Town North East Moon Gate")])),
-        Chest("Desert Crater Bomb Cave Chest 2", BASE_LOCATION_OFFSET+295, LocationFlag(0,3,7,3), Requirements([[ItemType.pegasus_bootsL2]], keys=[KeyType("Desert of Doubt Gerudo Town North East Moon Gate")])),
+        Chest("Desert Trap Chest 2", BASE_LOCATION_OFFSET+288, LocationFlag(1,3,0,1), Requirements([[ItemType.rocs_feather | ItemType.pegasus_bootsL2]], keys=[KeyType("Desert of Doubt Gerudo Town North East Moon Gate")], gap_bigest_regroup=True, desert_death_clip=True)),
+        Chest("Desert Trap Chest 3", BASE_LOCATION_OFFSET+289, LocationFlag(1,3,0,2), Requirements([[ItemType.rocs_feather | ItemType.pegasus_bootsL2]], keys=[KeyType("Desert of Doubt Gerudo Town North East Moon Gate")], gap_bigest_regroup=True, desert_death_clip=True)),
+        Chest("Desert Trap Cave Chest", BASE_LOCATION_OFFSET+290, LocationFlag(1,3,5,0), Requirements([[ItemType.rocs_feather | ItemType.pegasus_bootsL2]], keys=[KeyType("Desert of Doubt Gerudo Town North East Moon Gate")], gap_bigest_regroup=True, desert_death_clip=True)),
+        Chest("Desert Crater Sand Chest", BASE_LOCATION_OFFSET+291, LocationFlag(0,3,5,0), Requirements([[ItemType.rocs_feather | ItemType.pegasus_bootsL2]], keys=[KeyType("Desert of Doubt Gerudo Town North East Moon Gate")], gap_bigest_regroup=True, desert_death_clip=True)),
+        Chest("Desert Crater Hole Chest 1", BASE_LOCATION_OFFSET+292, LocationFlag(0,3,6,0), Requirements([[ItemType.rocs_feather | ItemType.pegasus_bootsL2]], keys=[KeyType("Desert of Doubt Gerudo Town North East Moon Gate")], gap_bigest_regroup=True, desert_death_clip=True)),
+        Chest("Desert Crater Hole Chest 2", BASE_LOCATION_OFFSET+293, LocationFlag(0,3,7,0), Requirements([[ItemType.rocs_feather | ItemType.pegasus_bootsL2]], keys=[KeyType("Desert of Doubt Gerudo Town North East Moon Gate")], gap_bigest_regroup=True, desert_death_clip=True)),
+        Chest("Desert Crater Bomb Cave Chest 1", BASE_LOCATION_OFFSET+294, LocationFlag(0,3,7,2), Requirements([[ItemType.rocs_feather | ItemType.pegasus_bootsL2]], keys=[KeyType("Desert of Doubt Gerudo Town North East Moon Gate")], gap_bigest_regroup=True, desert_death_clip=True)),
+        Chest("Desert Crater Bomb Cave Chest 2", BASE_LOCATION_OFFSET+295, LocationFlag(0,3,7,3), Requirements([[ItemType.rocs_feather | ItemType.pegasus_bootsL2]], keys=[KeyType("Desert of Doubt Gerudo Town North East Moon Gate")], gap_bigest_regroup=True, desert_death_clip=True)),
     ], [
         Door("Desert of Doubt Gerudo Town North East Moon Gate", 1, DoorType.moon_gate, LocationFlag(2,4,0,22)),
-    ], jewel=Jewel("Red Royal Jewel", BASE_LOCATION_OFFSET+495, LocationFlag(0,1,0,18), Requirements([[ItemType.pegasus_bootsL2]], keys=[KeyType("Desert of Doubt Gerudo Town North East Moon Gate")])),
+    ], jewel=Jewel("Red Royal Jewel", BASE_LOCATION_OFFSET+495, LocationFlag(0,1,0,18), Requirements([[ItemType.rocs_feather | ItemType.pegasus_bootsL2]], keys=[KeyType("Desert of Doubt Gerudo Town North East Moon Gate")], gap_bigest_regroup=True, desert_death_clip=True)),
     ),
     
     "Desert Temple": ZfsaRegion("Desert Temple", 61, BASE_LOCATION_OFFSET+296, Requirements([[ItemType.bow]], keys=[KeyType("Desert Temple Progressive Key", 3)]), [
@@ -555,7 +561,7 @@ ALL_REGIONS: dict[str, ZfsaRegion] = {
     ], parentRegion="Desert of Doubt"),
     
     "Pyramid": ZfsaRegion("Pyramid", 63, BASE_LOCATION_OFFSET+307, Requirements([[ItemType.bombs]], keys=[KeyType("Pyramid South Corridor Key")]), [
-        Key("North West Key", BASE_LOCATION_OFFSET+308, LocationFlag(0,4,0,21), Requirements([[ItemType.boomerang | ItemType.bow | ItemType.slingshot]])),
+        Key("North West Key", BASE_LOCATION_OFFSET+308, LocationFlag(0,4,0,21), Requirements([[ItemType.boomerang | ItemType.bow | ItemType.slingshot | ItemType.bombsL2]])),
         Key("South East Pearl", BASE_LOCATION_OFFSET+309, LocationFlag(3,5,0,63), Requirements([], keys=[KeyType("Pyramid South Corridor Key"), KeyType("Pyramid South East Key")])),
     ], [
         Chest("South Corridor Chest 1", BASE_LOCATION_OFFSET+310, LocationFlag(1,7,0,0), Requirements()),
@@ -565,18 +571,18 @@ ALL_REGIONS: dict[str, ZfsaRegion] = {
         Chest("Small Rooms Bottom Chest", BASE_LOCATION_OFFSET+314, LocationFlag(1,6,0,1), Requirements([], keys=[KeyType("Pyramid South Corridor Key")])),
         Chest("North East Chest 1", BASE_LOCATION_OFFSET+315, LocationFlag(3,4,0,0), Requirements([[ItemType.pegasus_bootsL2]], keys=[KeyType("Pyramid South Corridor Key")])),
         Chest("North East Chest 2", BASE_LOCATION_OFFSET+316, LocationFlag(3,4,0,1), Requirements([[ItemType.pegasus_bootsL2]], keys=[KeyType("Pyramid South Corridor Key")])),
-        Chest("Center Moon Gate Center Chest", BASE_LOCATION_OFFSET+317, LocationFlag(2,4,1,3), Requirements([[ItemType.rocs_featherL2, ItemType.pegasus_boots | ItemType.bombs], [ItemType.pegasus_bootsL2]], keys=[KeyType("Pyramid South Corridor Key"), KeyType("Pyramid Center Moon Gate")])),
-        Chest("Center Moon Gate Left Chest", BASE_LOCATION_OFFSET+318, LocationFlag(2,4,1,22), Requirements([[ItemType.rocs_feather, ItemType.pegasus_boots | ItemType.bombs], [ItemType.pegasus_bootsL2]], keys=[KeyType("Pyramid South Corridor Key"), KeyType("Pyramid Center Moon Gate")])),
+        Chest("Center Moon Gate Center Chest", BASE_LOCATION_OFFSET+317, LocationFlag(2,4,1,3), Requirements([[ItemType.rocs_feather | ItemType.pegasus_bootsL2, ItemType.pegasus_boots | ItemType.bombs]], keys=[KeyType("Pyramid South Corridor Key"), KeyType("Pyramid Center Moon Gate")], gap_big_regroup=True)),
+        Chest("Center Moon Gate Left Chest", BASE_LOCATION_OFFSET+318, LocationFlag(2,4,1,22), Requirements([[ItemType.rocs_feather | ItemType.pegasus_bootsL2, ItemType.pegasus_boots | ItemType.bombs]], keys=[KeyType("Pyramid South Corridor Key"), KeyType("Pyramid Center Moon Gate")])),
         Chest("Center Moon Gate Right Chest", BASE_LOCATION_OFFSET+319, LocationFlag(2,4,1,28), Requirements([[ItemType.pegasus_bootsL2]], keys=[KeyType("Pyramid South Corridor Key"), KeyType("Pyramid Center Moon Gate")])),
-        Chest("Center Room Chest 1", BASE_LOCATION_OFFSET+320, LocationFlag(1,4,0,0), Requirements([[ItemType.rocs_featherL2, ItemType.pegasus_boots | ItemType.bombs], [ItemType.pegasus_bootsL2]], keys=[KeyType("Pyramid South Corridor Key"), KeyType("Pyramid Center Moon Gate")])),
-        Chest("Center Room Chest 2", BASE_LOCATION_OFFSET+321, LocationFlag(1,4,0,1), Requirements([[ItemType.rocs_featherL2, ItemType.pegasus_boots | ItemType.bombs], [ItemType.pegasus_bootsL2]], keys=[KeyType("Pyramid South Corridor Key"), KeyType("Pyramid Center Moon Gate")])),
-        Chest("Center Room Chest 3", BASE_LOCATION_OFFSET+322, LocationFlag(1,4,0,2), Requirements([[ItemType.rocs_featherL2, ItemType.pegasus_boots | ItemType.bombs], [ItemType.pegasus_bootsL2]], keys=[KeyType("Pyramid South Corridor Key"), KeyType("Pyramid Center Moon Gate")])),
-        Chest("Center Room Chest 4", BASE_LOCATION_OFFSET+323, LocationFlag(1,4,0,3), Requirements([[ItemType.rocs_featherL2, ItemType.pegasus_boots | ItemType.bombs], [ItemType.pegasus_bootsL2]], keys=[KeyType("Pyramid South Corridor Key"), KeyType("Pyramid Center Moon Gate")])),
-        #Chest("Center Room Big Chest", BASE_LOCATION_OFFSET+324, LocationFlag(1,4,0,4), Requirements([[ItemType.rocs_featherL2, ItemType.pegasus_boots | ItemType.bombs], [ItemType.pegasus_bootsL2]], keys=[KeyType("Pyramid South Corridor Key"), KeyType("Pyramid Center Moon Gate"), KeyType("Pyramid Big Key")])),
-        Chest("Center Room Chest 5", BASE_LOCATION_OFFSET+325, LocationFlag(1,4,0,5), Requirements([[ItemType.rocs_featherL2, ItemType.pegasus_boots | ItemType.bombs], [ItemType.pegasus_bootsL2]], keys=[KeyType("Pyramid South Corridor Key"), KeyType("Pyramid Center Moon Gate")])),
-        Chest("Center Room Chest 6", BASE_LOCATION_OFFSET+326, LocationFlag(1,4,0,6), Requirements([[ItemType.rocs_featherL2, ItemType.pegasus_boots | ItemType.bombs], [ItemType.pegasus_bootsL2]], keys=[KeyType("Pyramid South Corridor Key"), KeyType("Pyramid Center Moon Gate")])),
-        Chest("Center Room Chest 7", BASE_LOCATION_OFFSET+327, LocationFlag(1,4,0,7), Requirements([[ItemType.rocs_featherL2, ItemType.pegasus_boots | ItemType.bombs], [ItemType.pegasus_bootsL2]], keys=[KeyType("Pyramid South Corridor Key"), KeyType("Pyramid Center Moon Gate")])),
-        Chest("Center Room Chest 8", BASE_LOCATION_OFFSET+328, LocationFlag(1,4,0,8), Requirements([[ItemType.rocs_featherL2, ItemType.pegasus_boots | ItemType.bombs], [ItemType.pegasus_bootsL2]], keys=[KeyType("Pyramid South Corridor Key"), KeyType("Pyramid Center Moon Gate")])),
+        Chest("Center Room Chest 1", BASE_LOCATION_OFFSET+320, LocationFlag(1,4,0,0), Requirements([[ItemType.rocs_featherL2 | ItemType.pegasus_bootsL2, ItemType.pegasus_boots | ItemType.bombs]], keys=[KeyType("Pyramid South Corridor Key"), KeyType("Pyramid Center Moon Gate")])),
+        Chest("Center Room Chest 2", BASE_LOCATION_OFFSET+321, LocationFlag(1,4,0,1), Requirements([[ItemType.rocs_featherL2 | ItemType.pegasus_bootsL2, ItemType.pegasus_boots | ItemType.bombs]], keys=[KeyType("Pyramid South Corridor Key"), KeyType("Pyramid Center Moon Gate")])),
+        Chest("Center Room Chest 3", BASE_LOCATION_OFFSET+322, LocationFlag(1,4,0,2), Requirements([[ItemType.rocs_featherL2 | ItemType.pegasus_bootsL2, ItemType.pegasus_boots | ItemType.bombs]], keys=[KeyType("Pyramid South Corridor Key"), KeyType("Pyramid Center Moon Gate")])),
+        Chest("Center Room Chest 4", BASE_LOCATION_OFFSET+323, LocationFlag(1,4,0,3), Requirements([[ItemType.rocs_featherL2 | ItemType.pegasus_bootsL2, ItemType.pegasus_boots | ItemType.bombs]], keys=[KeyType("Pyramid South Corridor Key"), KeyType("Pyramid Center Moon Gate")])),
+        #Chest("Center Room Big Chest", BASE_LOCATION_OFFSET+324, LocationFlag(1,4,0,4), Requirements([[ItemType.rocs_featherL2 | ItemType.pegasus_bootsL2, ItemType.pegasus_boots | ItemType.bombs]], keys=[KeyType("Pyramid South Corridor Key"), KeyType("Pyramid Center Moon Gate"), KeyType("Pyramid Big Key")])),
+        Chest("Center Room Chest 5", BASE_LOCATION_OFFSET+325, LocationFlag(1,4,0,5), Requirements([[ItemType.rocs_featherL2 | ItemType.pegasus_bootsL2, ItemType.pegasus_boots | ItemType.bombs]], keys=[KeyType("Pyramid South Corridor Key"), KeyType("Pyramid Center Moon Gate")])),
+        Chest("Center Room Chest 6", BASE_LOCATION_OFFSET+326, LocationFlag(1,4,0,6), Requirements([[ItemType.rocs_featherL2 | ItemType.pegasus_bootsL2, ItemType.pegasus_boots | ItemType.bombs]], keys=[KeyType("Pyramid South Corridor Key"), KeyType("Pyramid Center Moon Gate")])),
+        Chest("Center Room Chest 7", BASE_LOCATION_OFFSET+327, LocationFlag(1,4,0,7), Requirements([[ItemType.rocs_featherL2 | ItemType.pegasus_bootsL2, ItemType.pegasus_boots | ItemType.bombs]], keys=[KeyType("Pyramid South Corridor Key"), KeyType("Pyramid Center Moon Gate")])),
+        Chest("Center Room Chest 8", BASE_LOCATION_OFFSET+328, LocationFlag(1,4,0,8), Requirements([[ItemType.rocs_featherL2 | ItemType.pegasus_bootsL2, ItemType.pegasus_boots | ItemType.bombs]], keys=[KeyType("Pyramid South Corridor Key"), KeyType("Pyramid Center Moon Gate")])),
         Chest("Center Room Bomb Wall Chest", BASE_LOCATION_OFFSET+329, LocationFlag(1,4,6,0), Requirements([[ItemType.bombs]], keys=[KeyType("Pyramid South Corridor Key")])),
     ], [
         Door("Pyramid South Corridor Key", 1, DoorType.door, LocationFlag(1,7,0,2)),
@@ -733,9 +739,10 @@ ALL_REGIONS: dict[str, ZfsaRegion] = {
         Door("The Dark Cloud 3D Moon Gate", 1, DoorType.moon_gate, LocationFlag(5,9,0,43)),
         #Door("The Dark Cloud Big Key", 1, DoorType.big_chest, LocationFlag(4,5,0,0)),
         Door("The Dark Cloud Merge Left Moon Gate", 1, DoorType.door, LocationFlag(6,5,0,7)),
-    ], parentRegion="Realm of the Heavens"),
+    ], jewel=Jewel("Dark Mirror", BASE_LOCATION_OFFSET+497, LocationFlag(6,2,0,17), Requirements([[ItemType.bow, ItemType.lamp | ItemType.fire_rod | ItemType.rocs_feather | ItemType.pegasus_bootsL2]], jump_pound_side=True, jewels=True, wind_tower=True, zelda=True))
+    , parentRegion="Realm of the Heavens"),
     
-    "Palace of Winds": ZfsaRegion("Palace of Winds", 83, BASE_LOCATION_OFFSET+441, Requirements([[ItemType.rocs_feather, ItemType.bow]], keys=[KeyType("Palace of Winds Progressive Moon Gate", 4), KeyType("Palace of Winds Progressive 2F North Key")], special_palace_of_winds=True, jewels=True, wind_tower=True, zelda=True), [
+    "Palace of Winds": ZfsaRegion("Palace of Winds", 83, BASE_LOCATION_OFFSET+441, Requirements([[ItemType.rocs_feather | ItemType.pegasus_bootsL2, ItemType.bow]], keys=[KeyType("Palace of Winds Progressive Moon Gate", 4), KeyType("Palace of Winds Progressive 2F North Key")], special_palace_of_winds=True, jewels=True, wind_tower=True, zelda=True), [
         Key("2F North Key", BASE_LOCATION_OFFSET+442, LocationFlag(3,5,0,11), Requirements([], keys=4)),
     ], [
         Chest("Entrance Right RNG Chest 1-1", BASE_LOCATION_OFFSET+443, LocationFlag(4,8,0,0), Requirements()),
@@ -778,17 +785,17 @@ ALL_REGIONS: dict[str, ZfsaRegion] = {
         Chest("2F Central Bottom Left Chest", BASE_LOCATION_OFFSET+480, LocationFlag(3,6,1,3), Requirements([], keys=[KeyType("Palace of Winds Progressive Moon Gate", 3)])),# or 1 pearl if they are not progressive
         Chest("2F Central Bottom Right Chest", BASE_LOCATION_OFFSET+481, LocationFlag(3,6,1,7), Requirements([], keys=[KeyType("Palace of Winds Progressive Moon Gate", 4)])),# or 1 pearl if they are not progressive
         Chest("2F North Flip Hole Chest", BASE_LOCATION_OFFSET+482, LocationFlag(4,4,5,0), Requirements([], keys=[KeyType("Palace of Winds Progressive Moon Gate", 4), KeyType("Palace of Winds Progressive 2F North Key")], bowless_gohma=True)),
-        Chest("2F North Flip Flip Chest 1", BASE_LOCATION_OFFSET+483, LocationFlag(4,4,6,16), Requirements([[ItemType.magic_hammer | ItemType.rocs_feather]], keys=[KeyType("Palace of Winds Progressive Moon Gate", 4), KeyType("Palace of Winds Progressive 2F North Key")], bowless_gohma=True)),
-        Chest("2F North Flip Flip Chest 2", BASE_LOCATION_OFFSET+484, LocationFlag(4,4,6,17), Requirements([[ItemType.magic_hammer | ItemType.rocs_feather]], keys=[KeyType("Palace of Winds Progressive Moon Gate", 4), KeyType("Palace of Winds Progressive 2F North Key")], bowless_gohma=True)),
+        Chest("2F North Flip Flip Chest 1", BASE_LOCATION_OFFSET+483, LocationFlag(4,4,6,16), Requirements([], keys=[KeyType("Palace of Winds Progressive Moon Gate", 4), KeyType("Palace of Winds Progressive 2F North Key")], bowless_gohma=True)),
+        Chest("2F North Flip Flip Chest 2", BASE_LOCATION_OFFSET+484, LocationFlag(4,4,6,17), Requirements([], keys=[KeyType("Palace of Winds Progressive Moon Gate", 4), KeyType("Palace of Winds Progressive 2F North Key")], bowless_gohma=True)),
         # Can be done with key 6 or [ItemType.rocs_feather | ItemType.pegasus_bootsL2, ItemType.bombs]
         Chest("2F North Void Chest", BASE_LOCATION_OFFSET+485, LocationFlag(3,4,2,9), Requirements([], keys=[KeyType("Palace of Winds Progressive Moon Gate", 4), KeyType("Palace of Winds Progressive 2F North Key")], special_palace_of_winds=True)),
         Chest("Descent B3F Chest", BASE_LOCATION_OFFSET+486, LocationFlag(9,4,0,8), Requirements([], keys=[KeyType("Palace of Winds Progressive Moon Gate", 4), KeyType("Palace of Winds Progressive 2F North Key")], special_palace_of_winds=True)),
         Chest("Descent B4F Left Chest", BASE_LOCATION_OFFSET+487, LocationFlag(9,5,0,0), Requirements([], keys=[KeyType("Palace of Winds Progressive Moon Gate", 4), KeyType("Palace of Winds Progressive 2F North Key")], special_palace_of_winds=True)),
         Chest("Descent B4F Right Chest", BASE_LOCATION_OFFSET+488, LocationFlag(9,5,0,1), Requirements([], keys=[KeyType("Palace of Winds Progressive Moon Gate", 4), KeyType("Palace of Winds Progressive 2F North Key")], special_palace_of_winds=True)),
         Chest("Descent B5F Left Chest", BASE_LOCATION_OFFSET+489, LocationFlag(9,6,6,0), Requirements([], keys=[KeyType("Palace of Winds Progressive Moon Gate", 4), KeyType("Palace of Winds Progressive 2F North Key")], special_palace_of_winds=True)),
-        Chest("Descent B5F Right Chest 1", BASE_LOCATION_OFFSET+490, LocationFlag(9,6,6,1), Requirements([[ItemType.rocs_feather]], keys=[KeyType("Palace of Winds Progressive Moon Gate", 4), KeyType("Palace of Winds Progressive 2F North Key")], special_palace_of_winds=True)),
-        Chest("Descent B5F Right Chest 2", BASE_LOCATION_OFFSET+491, LocationFlag(9,6,6,6), Requirements([[ItemType.rocs_feather]], keys=[KeyType("Palace of Winds Progressive Moon Gate", 4), KeyType("Palace of Winds Progressive 2F North Key")], special_palace_of_winds=True)),
-        Chest("Descent B6F Chest", BASE_LOCATION_OFFSET+492, LocationFlag(9,7,0,0), Requirements([[ItemType.rocs_feather]], keys=[KeyType("Palace of Winds Progressive Moon Gate", 4), KeyType("Palace of Winds Progressive 2F North Key")], special_palace_of_winds=True)),
+        Chest("Descent B5F Right Chest 1", BASE_LOCATION_OFFSET+490, LocationFlag(9,6,6,1), Requirements([[ItemType.rocs_feather | ItemType.pegasus_bootsL2]], keys=[KeyType("Palace of Winds Progressive Moon Gate", 4), KeyType("Palace of Winds Progressive 2F North Key")], special_palace_of_winds=True)),
+        Chest("Descent B5F Right Chest 2", BASE_LOCATION_OFFSET+491, LocationFlag(9,6,6,6), Requirements([[ItemType.rocs_feather | ItemType.pegasus_bootsL2]], keys=[KeyType("Palace of Winds Progressive Moon Gate", 4), KeyType("Palace of Winds Progressive 2F North Key")], special_palace_of_winds=True)),
+        Chest("Descent B6F Chest", BASE_LOCATION_OFFSET+492, LocationFlag(9,7,0,0), Requirements([[ItemType.rocs_feather | ItemType.pegasus_bootsL2]], keys=[KeyType("Palace of Winds Progressive Moon Gate", 4), KeyType("Palace of Winds Progressive 2F North Key")], special_palace_of_winds=True)),
     ], [
         Door("Palace of Winds Progressive Moon Gate", 1, DoorType.moon_gate, LocationFlag(3,6,0,28)),
         Door("Palace of Winds Progressive Moon Gate", 2, DoorType.moon_gate, LocationFlag(3,6,0,29)),

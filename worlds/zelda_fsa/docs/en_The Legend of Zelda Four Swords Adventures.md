@@ -15,6 +15,7 @@
 ## Checks
 
 - All Chests (excl. Big Chest) (401)
+- Royal Jewels & Dark Mirror (5)
 - Beating a Stage (23)
 
 ## Items
@@ -26,7 +27,7 @@
 - Heart Pieces (32 - Starting Max Health)
 - Progressive Level x Ticket (2 per Level)
 - 4 Royal Jewels
-- 7 Maidens (no function currently)
+- 7 Maidens
 - 1 of every Key, Moon Pearl, Book, or Letter (some act as progressive if they are required in order) (66 total)
 
 ### Traps
@@ -48,10 +49,13 @@ Beat Palace of Winds (Defeat Gannon and get to the save popup)
 This requires:
 - 2 Progressive Level 8 Ticket
 - The 4 Royal Jewels
+- The 7 Maidens
 - 4 Palace of Winds Progressive Moon Gate
 - Palace of Winds Progressive 2F North Key
-- Roc's Feather
 - Bow
+- Either:
+	- Roc's Feather
+	- Pegasus Boots L2
 - Either:
 	- Bombs
 	- Palace of Winds Progressive 2F North Key

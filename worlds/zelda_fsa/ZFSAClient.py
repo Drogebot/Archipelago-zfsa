@@ -104,8 +104,7 @@ class ZfsaContext(CommonContext):
     jewels = 0
     maidens = 0
     gemtotal = 0
-    starting_health = 16
-    current_health = 16
+    current_health = 12
     current_level = 0
     current_screen = 0
     current_layer = 0
@@ -179,7 +178,6 @@ class ZfsaContext(CommonContext):
                 self.shuffle_stages = temp
             temp = slot_data.get("starting_health")
             if temp:
-                self.starting_health = temp
                 self.current_health = temp
             temp = slot_data.get("death_link")
             if temp:
@@ -414,7 +412,7 @@ def refresh_all_items(ctx: ZfsaContext):
             if ctx.is_first_item_sync:
                 continue
         
-        if ctx.known_items[item] != amt:
+        elif ctx.known_items[item] != amt:
             has_new_items = True
             if ctx.is_first_item_sync:
                 amt = ctx.known_items[item]
@@ -513,6 +511,7 @@ def activate_ticket(id: int, amt: int, ctx):
 
 
 def activate_item(id, amt, ctx):
+    amt = min(amt, 2)
     for item in KEYITEMS:
         if id == item.ap_item_id:
             if item.item_lvl >= amt: return
@@ -535,8 +534,8 @@ def activate_power_bracelet(ctx):
 
 
 def activate_heart_piece(amt, ctx):
-    if ctx.current_health >= ctx.starting_health + amt: return
-    ctx.current_health = ctx.starting_health + amt
+    if ctx.current_health >= amt: return
+    ctx.current_health = amt
     show_message("Received Heart Piece", ctx)
 
 
@@ -548,15 +547,15 @@ def activate_jewel(id, ctx):
 
 
 def activate_maiden(amt, ctx):
-    for i in range(0, amt):
+    maidens = ["Blue Maiden", "Yellow Maiden", "Green Maiden", "White Maiden", "Red Maiden", "Purple Maiden", "Princess Zelda"]
+    for i in range(0, min(amt, len(maidens))):
         if ctx.maidens & (1 << i) > 0: continue
         ctx.maidens |= 1 << i
-        maidens = ["Blue Maiden", "Yellow Maiden", "Green Maiden", "White Maiden", "Red Maiden", "Purple Maiden", "Princess Zelda"]
         show_message(f"Received {maidens[i]}", ctx)
 
 
 def activate_door(id, amt, ctx):
-    for i in range(0, amt):
+    for i in range(0, min(amt, len(DOORMAP_BY_ITEMID[id]))):
         door = DOORMAP_BY_ITEMID[id][i]
         if door.opened: continue
         door.opened = True
@@ -919,11 +918,11 @@ async def handle_link(ctx):
                         #link item legal
                         equiped_item = dme.read_word(link_adr + addresses.ZFSA_LINK_ITEM_OFFSET)
                         equiped_item_lvl = dme.read_word(link_adr + addresses.ZFSA_LINK_ITEMLVL_OFFSET)
-                        if equiped_item <= 10:
+                        if equiped_item < len(KEYITEMS):
                             if not KEYITEMS[equiped_item].active:
                                 while not KEYITEMS[equiped_item].active:
                                     equiped_item += 1
-                                    if equiped_item > 10:
+                                    if equiped_item >= len(KEYITEMS):
                                         equiped_item = 0
                                 dme.write_word(link_adr + addresses.ZFSA_LINK_ITEM_OFFSET, equiped_item)
                             if equiped_item_lvl != KEYITEMS[equiped_item].item_lvl:
@@ -940,12 +939,12 @@ async def handle_link(ctx):
                             if isDpadRPressed and not wasDpadRPressed: equip_item += 1
                             if equip_item != equiped_item:
                                 cycledir = 1 if isDpadRPressed else -1
-                                if equip_item > 10: equip_item = 0
-                                if equip_item < 0: equip_item = 10
+                                if equip_item >= len(KEYITEMS): equip_item = 0
+                                if equip_item < 0: equip_item = len(KEYITEMS)-1
                                 while not KEYITEMS[equip_item].active:
                                     equip_item += cycledir
-                                    if equip_item > 10: equip_item = 0
-                                    if equip_item < 0: equip_item = 10
+                                    if equip_item >= len(KEYITEMS): equip_item = 0
+                                    if equip_item < 0: equip_item = len(KEYITEMS)-1
                                 item = KEYITEMS[equip_item]
                                 #show_message(f"Equiped {item.item_name} L{item.item_lvl}!", ctx)
                                 dme.write_word(link_adr + addresses.ZFSA_LINK_ITEM_OFFSET, equip_item)
