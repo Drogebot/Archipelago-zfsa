@@ -47,6 +47,12 @@ class MinorTricks(Toggle):
     default = False
 
 
+class ItemPedestals(Toggle):
+    """Turning this on will add all Item Pedestals as locations."""
+    display_name = "Inlcude Item Pedestals as locations"
+    default = False
+
+
 @dataclass
 class ZfsaOptions(PerGameCommonOptions):
     level_access: LevelAccess
@@ -55,3 +61,4 @@ class ZfsaOptions(PerGameCommonOptions):
     death_link: DeathLink
     lamp_for_dark: LampForDark
     minor_tricks: MinorTricks
+    item_pedestals: ItemPedestals

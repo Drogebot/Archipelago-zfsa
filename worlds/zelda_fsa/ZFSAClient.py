@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import math
 import asyncio
 import collections
 import time
@@ -412,7 +413,7 @@ def refresh_all_items(ctx: ZfsaContext):
             if ctx.is_first_item_sync:
                 continue
         
-        elif ctx.known_items[item] != amt:
+        elif ctx.known_items[item] < amt:
             has_new_items = True
             if ctx.is_first_item_sync:
                 amt = ctx.known_items[item]
@@ -469,7 +470,7 @@ def unpack_item(item, ctx, amt=0):
         activate_tingle_trap(amt, ctx)
     elif item == BASE_ITEM_OFFSET+49:
         activate_fire_trap(amt, ctx)
-    elif BASE_ITEM_OFFSET+51 <= item <= BASE_ITEM_OFFSET+100:
+    elif BASE_ITEM_OFFSET+52 <= item <= BASE_ITEM_OFFSET+100:
         activate_door(item, amt, ctx)
 
 
@@ -699,6 +700,10 @@ def create_location_memory_map():
             loc = LocationInfo(chest.id, chest.flagId, DoorType.big_chest)
             LOCMAP_BY_LOCATIONID[chest.id] = loc
             LOCMAP[region.stageId].append(loc)
+        for pedestal in region.pedestals:
+            loc = LocationInfo(pedestal.id, pedestal.flagId, DoorType.pedestal)
+            LOCMAP_BY_LOCATIONID[pedestal.id] = loc
+            LOCMAP[region.stageId].append(loc)
         if region.jewel is not None:
             loc = LocationInfo(region.jewel.id, region.jewel.flagId, DoorType.local_variable)
             LOCMAP_BY_LOCATIONID[region.jewel.id] = loc
@@ -767,7 +772,9 @@ async def handle_stage_select(ctx):
                 for ticket in TICKETS:
                     if not ticket.active:
                         continue
-                    if ticket.bit_position >= 28 and ctx.jewels != 0b1111:
+                    if ticket.bit_position >= 24 and ctx.jewels != 0b1111 and ctx.maidens != 0b111111:
+                        continue
+                    if ticket.bit_position >= 28 and ctx.maidens != 0b1111111:
                         continue
                     stage_select_flags |= 1 << ticket.bit_position
                 dme.write_word(menu_adr + addresses.ZFSA_MENU_STAGE_SELECT_FLAGS_OFFSET, stage_select_flags)
@@ -822,6 +829,16 @@ async def handle_stage(ctx):
                                         elif (val & (1 << bit)) > 0:
                                             chest.checked = True
                                             ctx.locations_checked.add(chest.location_id)
+                                    elif loc.type == DoorType.pedestal:
+                                        pedestal = loc
+                                        offset = pedestal.flagId.roomy*10*8*8 + pedestal.flagId.roomx*8*8 + pedestal.flagId.layer*8 + 4*(pedestal.flagId.index >> 3)
+                                        bit = 28 - ((pedestal.flagId.index & 0b111) << 2)
+                                        val = dme.read_word(stage_adr + addresses.ZFSA_STAGE_TILE_FLAGS_OFFSET + offset)
+                                        if pedestal.checked and (prev_level != cur_level or prev_screen != cur_screen):
+                                            dme.write_word(stage_adr + addresses.ZFSA_STAGE_TILE_FLAGS_OFFSET + offset, (val & ~(0b1111 << bit)) | (1 << bit))
+                                        elif ((val >> bit) & 0b1111) == 1:
+                                            pedestal.checked = True
+                                            ctx.locations_checked.add(pedestal.location_id)
                                     elif loc.type == DoorType.local_variable:
                                         jewel = loc
                                         offset = jewel.flagId.roomy*10*4 + jewel.flagId.roomx*4

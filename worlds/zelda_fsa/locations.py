@@ -15,6 +15,9 @@ for region_name in ALL_REGIONS:
     for chest in region.chests:
         ALL_LOCATIONS_TABLE[f"{region.name} - {chest.name}"] = chest.id
     
+    for pedestal in region.pedestals:
+        ALL_LOCATIONS_TABLE[f"{region.name} - {pedestal.name}"] = pedestal.id
+    
     if region.jewel is not None:
         ALL_LOCATIONS_TABLE[f"{region.name} - {region.jewel.name}"] = region.jewel.id
     

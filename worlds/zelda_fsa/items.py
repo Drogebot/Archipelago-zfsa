@@ -84,45 +84,45 @@ TRAP_ITEMS: dict[str, tuple[int, int]] = {
     "Tingle Trap": (BASE_ITEM_OFFSET+48, 1),
     "Fire Trap": (BASE_ITEM_OFFSET+49, 1),
     #"Nova Bomb Trap": (BASE_ITEM_OFFSET+50, 1),
+    #"Cucco Trap": (BASE_ITEM_OFFSET+51, 1),
 }
 
 LEVEL_PROGRESSION_ITEMS: dict[str, tuple[int, int]] = {
-    "Lake Hylia House Key": (BASE_ITEM_OFFSET+51, 1), # junk
-    "Cave of No Return Progressive Key": (BASE_ITEM_OFFSET+52, 3), # need 3
-    "Hyrule Castle Inner Wall Key": (BASE_ITEM_OFFSET+53, 1),
-    "Village of the Blue Maiden Village Entrance Moon Gate": (BASE_ITEM_OFFSET+54, 1),
-    "Village of the Blue Maiden Village East Moon Gate": (BASE_ITEM_OFFSET+55, 1),
-    "Village of the Blue Maiden Village North Moon Gate": (BASE_ITEM_OFFSET+56, 1),
-    "Village of the Blue Maiden Village West Moon Gate": (BASE_ITEM_OFFSET+57, 1),
-    "Village of the Blue Maiden Book": (BASE_ITEM_OFFSET+58, 1),
-    "Village of the Blue Maiden Letter": (BASE_ITEM_OFFSET+59, 1), # junk
-    "Eastern Temple Entrance Key": (BASE_ITEM_OFFSET+60, 1),
-    "Eastern Temple North East Moon Gate": (BASE_ITEM_OFFSET+61, 1), # junk
-    "Eastern Temple South East Key": (BASE_ITEM_OFFSET+62, 1),
-    "Eastern Temple South West Key": (BASE_ITEM_OFFSET+63, 1),
-    "Eastern Temple South West Moon Gate": (BASE_ITEM_OFFSET+64, 1), # junk, skip damage boost
-    #"Eastern Temple Big Key": (BASE_ITEM_OFFSET+65, 1),
-    "The Mountain Path Water Storage Key": (BASE_ITEM_OFFSET+66, 1),
-    "Tower of Flames 4F Key": (BASE_ITEM_OFFSET+67, 1),
-    "The Field Storeroom Key": (BASE_ITEM_OFFSET+68, 1), # junk
-    "The Field Stange Cave Key": (BASE_ITEM_OFFSET+69, 1), # junk
-    "The Swamp Moon Gate": (BASE_ITEM_OFFSET+70, 1),
-    "The Swamp Progressive Graveyard East Key": (BASE_ITEM_OFFSET+71, 2), # need 2
-    "Infiltration of Hyrule Castle Outside Jail Key": (BASE_ITEM_OFFSET+72, 1), # junk, shortcut
-    "Infiltration of Hyrule Castle Basement Stairs Moon Gate": (BASE_ITEM_OFFSET+73, 1),
-    "Infiltration of Hyrule Castle Progressive Basement Key": (BASE_ITEM_OFFSET+74, 3), # need 3, 3rd is junk
-    "Lost Woods East Woods Moon Gate": (BASE_ITEM_OFFSET+75, 1),
-    "Lost Woods North Woods Storage Key": (BASE_ITEM_OFFSET+76, 1), # junk
-    "Lost Woods South Woods Storage Key": (BASE_ITEM_OFFSET+77, 1), # junk
-    "Kakariko Village South East House Key": (BASE_ITEM_OFFSET+78, 1),
-    "Temple of Darkness Progressive Key": (BASE_ITEM_OFFSET+79, 5), # need 5
-    "Temple of Darkness Secret Room Moon Gate": (BASE_ITEM_OFFSET+80, 1), # junk
-    "Desert of Doubt Gerudo Town North East Moon Gate": (BASE_ITEM_OFFSET+81, 1),
-    "Desert Temple Progressive Key": (BASE_ITEM_OFFSET+82, 3), # need 3
-    "Desert Temple Laser Room Moon Gate": (BASE_ITEM_OFFSET+83, 1),
-    "Pyramid South Corridor Key": (BASE_ITEM_OFFSET+84, 1),
-    "Pyramid South East Key": (BASE_ITEM_OFFSET+85, 1),
-    "Pyramid South East Moon Gate": (BASE_ITEM_OFFSET+86, 1), # junk
+    "Lake Hylia House Key": (BASE_ITEM_OFFSET+52, 1), # junk
+    "Cave of No Return Progressive Key": (BASE_ITEM_OFFSET+53, 3), # need 3
+    "Hyrule Castle Inner Wall Key": (BASE_ITEM_OFFSET+54, 1),
+    "Village of the Blue Maiden Village Entrance Moon Gate": (BASE_ITEM_OFFSET+55, 1),
+    "Village of the Blue Maiden Village East Moon Gate": (BASE_ITEM_OFFSET+56, 1),
+    "Village of the Blue Maiden Village North Moon Gate": (BASE_ITEM_OFFSET+57, 1),
+    "Village of the Blue Maiden Village West Moon Gate": (BASE_ITEM_OFFSET+58, 1),
+    "Village of the Blue Maiden Book": (BASE_ITEM_OFFSET+59, 1),
+    "Village of the Blue Maiden Letter": (BASE_ITEM_OFFSET+60, 1), # junk
+    "Eastern Temple Entrance Key": (BASE_ITEM_OFFSET+61, 1),
+    "Eastern Temple North East Moon Gate": (BASE_ITEM_OFFSET+62, 1), # junk
+    "Eastern Temple South East Key": (BASE_ITEM_OFFSET+63, 1),
+    "Eastern Temple South West Key": (BASE_ITEM_OFFSET+64, 1),
+    "Eastern Temple South West Moon Gate": (BASE_ITEM_OFFSET+65, 1), # junk, skip damage boost
+    #"Eastern Temple Big Key": (BASE_ITEM_OFFSET+66, 1),
+    "The Mountain Path Water Storage Key": (BASE_ITEM_OFFSET+67, 1),
+    "Tower of Flames 4F Key": (BASE_ITEM_OFFSET+68, 1),
+    "The Field Storage Key": (BASE_ITEM_OFFSET+69, 1), # junk
+    "The Field Stange Cave Key": (BASE_ITEM_OFFSET+70, 1), # junk
+    "The Swamp Moon Gate": (BASE_ITEM_OFFSET+71, 1),
+    "The Swamp Progressive Graveyard East Key": (BASE_ITEM_OFFSET+72, 2), # need 2
+    "Infiltration of Hyrule Castle Outside Jail Key": (BASE_ITEM_OFFSET+73, 1), # junk, shortcut
+    "Infiltration of Hyrule Castle Basement Stairs Moon Gate": (BASE_ITEM_OFFSET+74, 1),
+    "Infiltration of Hyrule Castle Progressive Basement Key": (BASE_ITEM_OFFSET+75, 3), # need 3, 3rd is junk
+    "Lost Woods East Woods Moon Gate": (BASE_ITEM_OFFSET+76, 1),
+    "Lost Woods North Woods Storage Key": (BASE_ITEM_OFFSET+77, 1), # junk
+    "Lost Woods South Woods Storage Key": (BASE_ITEM_OFFSET+78, 1), # junk
+    "Kakariko Village South East House Key": (BASE_ITEM_OFFSET+79, 1),
+    "Temple of Darkness Progressive Key": (BASE_ITEM_OFFSET+80, 5), # need 5
+    "Temple of Darkness Secret Room Moon Gate": (BASE_ITEM_OFFSET+81, 1), # junk
+    "Desert of Doubt Gerudo Town North East Moon Gate": (BASE_ITEM_OFFSET+82, 1),
+    "Desert Temple Progressive Key": (BASE_ITEM_OFFSET+83, 3), # need 3
+    "Desert Temple Laser Room Moon Gate": (BASE_ITEM_OFFSET+84, 1),
+    "Pyramid South Corridor Key": (BASE_ITEM_OFFSET+85, 1),
+    "Pyramid South East Progressive Key": (BASE_ITEM_OFFSET+86, 2), #need 2, 2nd is junk
     "Pyramid Center Moon Gate": (BASE_ITEM_OFFSET+87, 1),
     #"Pyramid Big Key": (BASE_ITEM_OFFSET+88, 1),
     "Frozen Hyrule House Key": (BASE_ITEM_OFFSET+89, 1),

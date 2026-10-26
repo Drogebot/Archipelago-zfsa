@@ -14,7 +14,7 @@ from .options import ZfsaOptions
 from .regions import create_regions
 
 
-WORLD_VERSION = "0.0.9"
+WORLD_VERSION = "0.0.10"
 
 
 class ZfsaWebWorld(WebWorld):
@@ -47,10 +47,7 @@ class ZfsaWorld(World):
         create_regions(self)
 
     def create_items(self):
-        total_pool_size = len(ALL_LOCATIONS_TABLE)
-        if self.options.level_access == 0:
-            total_pool_size -= 8*2
-        
+        total_pool_size = len(self.multiworld.get_unfilled_locations(self.player))
         pool = []
         for name in REGULAR_PROGRESSION_ITEMS.keys():
             item_id, item_amount = REGULAR_PROGRESSION_ITEMS[name]
@@ -96,7 +93,8 @@ class ZfsaWorld(World):
         return {"ticket_mode": self.options.level_access.value,
                 "shuffle_stages": self.options.shuffle_stages.value,
                 "starting_health": self.options.starting_health.value,
-                "death_link": self.options.death_link.value}
+                "death_link": self.options.death_link.value,
+                "item_pedestals": self.options.item_pedestals.value}
 
 
 def launch_client():

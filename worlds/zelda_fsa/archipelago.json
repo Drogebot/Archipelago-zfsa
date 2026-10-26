@@ -1,6 +1,6 @@
 {
 	"game": "The Legend of Zelda: Four Swords Adventures",
-	"world_version": "0.0.9",
+	"world_version": "0.0.10",
 	"authors": ["Drogings"],
 	"minimum_ap_version": "0.6.7",
 	"version": 7,

@@ -4,7 +4,7 @@ from BaseClasses import CollectionState, Region, ItemClassification
 from rule_builder.rules import And, Or, Has, CanReachRegion, True_
 from .items import ZfsaItem, TICKET_ITEMS
 from .locations import ZfsaLocation
-from .static_logic import ALL_REGIONS, ZfsaRegion, Key, Chest, Jewel, Requirements, ItemType
+from .static_logic import ALL_REGIONS, ZfsaRegion, Key, Chest, Pedestal, Jewel, Requirements, ItemType
 
 if TYPE_CHECKING:
     from . import ZfsaWorld
@@ -173,8 +173,8 @@ def zfsa_requirements_rule(requirements: Requirements, world: "ZfsaWorld"):
 
         if requirements.desert_cactus:
             trick_rules.append(Or(
-                Has("Progressive Pegasus Boots"),
                 Has("Progressive Roc's Feather"),
+                Has("Progressive Pegasus Boots", count=2),
             ))
 
         if requirements.desert_death_clip:
@@ -222,6 +222,10 @@ def zfsa_chest_rule(chest: Chest, world: "ZfsaWorld"):
     return zfsa_requirements_rule(chest.requirements, world)
 
 
+def zfsa_pedestal_rule(pedestal: Pedestal, world: "ZfsaWorld"):
+    return zfsa_requirements_rule(pedestal.requirements, world)
+
+
 def zfsa_jewel_rule(jewel: Jewel, world: "ZfsaWorld"):
     return zfsa_requirements_rule(jewel.requirements, world)
 
@@ -261,6 +265,11 @@ def create_region(region: ZfsaRegion, world: "ZfsaWorld"):
         new_location = ZfsaLocation(world.player, f"{region.name} - {chest.name}", chest.id, new_region)
         world.set_rule(new_location, zfsa_chest_rule(chest, world))
         new_region.locations.append(new_location)
+    if world.options.item_pedestals:
+        for pedestal in region.pedestals:
+            new_location = ZfsaLocation(world.player, f"{region.name} - {pedestal.name}", pedestal.id, new_region)
+            world.set_rule(new_location, zfsa_pedestal_rule(pedestal, world))
+            new_region.locations.append(new_location)
     if region.jewel is not None:
         new_location = ZfsaLocation(world.player, f"{region.name} - {region.jewel.name}", region.jewel.id, new_region)
         world.set_rule(new_location, zfsa_jewel_rule(region.jewel, world))
